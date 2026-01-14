@@ -88,7 +88,7 @@ Note: Phase 5 (Backend) can potentially run in parallel with Phases 2-4 since th
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Foundation | 0/TBD | Not started | - |
+| 1. Foundation | 1/3 | In progress | - |
 | 2. Book Data Layer | 0/TBD | Not started | - |
 | 3. Core UI - Main Feed | 0/TBD | Not started | - |
 | 4. Book Info & Actions | 0/TBD | Not started | - |
