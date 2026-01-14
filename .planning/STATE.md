@@ -10,9 +10,9 @@ See: .planning/PROJECT.md (updated 2026-01-14)
 ## Current Position
 
 Phase: 2 of 8 (Book Data Layer) - IN PROGRESS
-Plan: 3 of TBD in current phase
+Plan: 2 of TBD in current phase
 Status: In progress
-Last activity: 2026-01-14 — Completed 02-03-PLAN.md
+Last activity: 2026-01-14 — Completed 02-02-PLAN.md
 
 Progress: █████░░░░░ 40%
 
@@ -31,7 +31,7 @@ Progress: █████░░░░░ 40%
 | 02-book-data-layer | 2/TBD | 20 min | 10 min |
 
 **Recent Trend:**
-- Last 5 plans: 01-02 (12 min), 01-03 (15 min), 02-01 (12 min), 02-03 (8 min)
+- Last 5 plans: 01-02 (12 min), 01-03 (15 min), 02-01 (12 min), 02-02 (8 min)
 - Trend: Consistent velocity with faster execution on focused plans
 
 ## Accumulated Context
@@ -57,10 +57,12 @@ Recent decisions affecting current work:
 | 02-01 | Platform-specific engines | OkHttp (Android), Darwin (iOS) for optimal performance |
 | 02-01 | Single author string | MVP simplicity; will expand to List<String> for multi-author books |
 | 02-01 | BookCover utility model | Non-serializable helper for multi-size cover image handling |
-| 02-03 | OL: ID prefix | Distinguish Open Library books from Google Books for source tracking |
-| 02-03 | Dynamic JSON key handling | Use JsonObject to extract data from non-fixed response keys |
-| 02-03 | No Open Library API key | Free public API, simplifies integration and deployment |
-| 02-03 | Separate cover URL generation | Flexible cover fetching without full book data request |
+| 02-02 | Google Books API primary source | Reliable metadata and comprehensive cover image sizes |
+| 02-02 | Result<T> error handling | Non-exceptional error handling pattern for API calls |
+| 02-02 | Extension function mapping | Clean DTO to domain conversion with toBook() extension |
+| 02-02 | Cover size preference | Large → medium → thumbnail for best quality |
+| 02-02 | ISBN-13 preference | Modern standard over ISBN-10, null if unavailable |
+| 02-02 | Google Books API key required | External API key needed for requests (not hardcoded) |
 
 ### Deferred Issues
 
@@ -76,7 +78,7 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-01-14T23:43:00Z
-Stopped at: Completed 02-03-PLAN.md
+Last session: 2026-01-14T23:23:00Z
+Stopped at: Completed 02-02-PLAN.md
 Resume file: None
 Next: Continue with next plan in Phase 02-book-data-layer
