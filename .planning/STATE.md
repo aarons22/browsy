@@ -10,29 +10,29 @@ See: .planning/PROJECT.md (updated 2026-01-14)
 ## Current Position
 
 Phase: 2 of 8 (Book Data Layer) - IN PROGRESS
-Plan: 2 of TBD in current phase
+Plan: 4 of TBD in current phase
 Status: In progress
-Last activity: 2026-01-14 — Completed 02-02-PLAN.md
+Last activity: 2026-01-14 — Completed 02-04-PLAN.md
 
-Progress: █████░░░░░ 40%
+Progress: ██████░░░░ 60%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 5
-- Average duration: 11 min
-- Total execution time: 55 min
+- Total plans completed: 6
+- Average duration: 8 min
+- Total execution time: 57 min
 
 **By Phase:**
 
 | Phase | Plans | Total | Avg/Plan |
 |-------|-------|-------|----------|
 | 01-foundation | 3/3 | 35 min | 12 min |
-| 02-book-data-layer | 2/TBD | 20 min | 10 min |
+| 02-book-data-layer | 3/TBD | 22 min | 7 min |
 
 **Recent Trend:**
-- Last 5 plans: 01-02 (12 min), 01-03 (15 min), 02-01 (12 min), 02-02 (8 min)
-- Trend: Consistent velocity with faster execution on focused plans
+- Last 5 plans: 01-03 (15 min), 02-01 (12 min), 02-02 (8 min), 02-03 (8 min), 02-04 (2 min)
+- Trend: Accelerating velocity on well-scoped implementation plans
 
 ## Accumulated Context
 
@@ -63,6 +63,11 @@ Recent decisions affecting current work:
 | 02-02 | Cover size preference | Large → medium → thumbnail for best quality |
 | 02-02 | ISBN-13 preference | Modern standard over ISBN-10, null if unavailable |
 | 02-02 | Google Books API key required | External API key needed for requests (not hardcoded) |
+| 02-03 | OL: ID prefix | Distinguishes Open Library books from Google Books (GB:) for source tracking |
+| 02-03 | Dynamic key handling | JsonObject extraction for API responses with non-fixed keys |
+| 02-04 | LRU cache with 30-min TTL | Balances data freshness with reduced API calls |
+| 02-04 | Dual-API fallback | Google Books primary, Open Library fallback for ISBN lookups |
+| 02-04 | expect/actual for time | Platform-specific currentTimeMillis() enables KMP-compatible caching |
 
 ### Deferred Issues
 
@@ -78,7 +83,7 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-01-14T23:23:00Z
-Stopped at: Completed 02-02-PLAN.md
+Last session: 2026-01-14T23:38:43Z
+Stopped at: Completed 02-04-PLAN.md
 Resume file: None
 Next: Continue with next plan in Phase 02-book-data-layer
