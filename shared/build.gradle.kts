@@ -1,6 +1,7 @@
 plugins {
     alias(libs.plugins.kotlinMultiplatform)
     alias(libs.plugins.androidLibrary)
+    kotlin("plugin.serialization") version "2.0.0"
 }
 
 kotlin {
@@ -25,16 +26,19 @@ kotlin {
 
     sourceSets {
         commonMain.dependencies {
-            // No external dependencies for now - pure Kotlin
+            implementation(libs.ktor.client.core)
+            implementation(libs.ktor.client.content.negotiation)
+            implementation(libs.ktor.serialization.kotlinx.json)
+            implementation(libs.kotlinx.serialization.json)
         }
         commonTest.dependencies {
             implementation(kotlin("test"))
         }
         androidMain.dependencies {
-            // Android-specific dependencies if needed
+            implementation(libs.ktor.client.okhttp)
         }
         iosMain.dependencies {
-            // iOS-specific dependencies if needed
+            implementation(libs.ktor.client.darwin)
         }
     }
 }
