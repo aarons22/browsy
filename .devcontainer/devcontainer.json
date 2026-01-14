@@ -13,7 +13,7 @@
     "ghcr.io/devcontainers/features/github-cli:1": {}
   },
 
-  "postCreateCommand": "npm install -g @anthropic-ai/claude-code get-shit-done-cc",
+  "postCreateCommand": "npm install -g @anthropic-ai/claude-code && npx get-shit-done-cc",
 
   "customizations": {
     "vscode": {
