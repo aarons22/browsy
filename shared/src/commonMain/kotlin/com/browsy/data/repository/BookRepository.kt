@@ -150,4 +150,40 @@ class BookRepository(
         googleBooksApi.close()
         openLibraryApi.close()
     }
+
+    companion object {
+        /**
+         * Creates a BookRepository instance with default configuration.
+         *
+         * This factory method initializes the repository with:
+         * - GoogleBooksApi configured with provided API key
+         * - OpenLibraryApi as fallback (no key required)
+         * - BookCache with default settings (100 entries, 30-min TTL)
+         *
+         * API key configuration:
+         * - Obtain Google Books API key from Google Cloud Console
+         * - Enable Books API for your project
+         * - Pass the key to this method (should come from platform-specific config)
+         * - Do not hardcode API keys in source code
+         *
+         * Usage:
+         * ```
+         * // Android: Read from BuildConfig or local.properties
+         * val repo = BookRepository.create(BuildConfig.GOOGLE_BOOKS_API_KEY)
+         *
+         * // iOS: Read from Info.plist or Bundle
+         * let repo = BookRepository.create(apiKey: Bundle.main.object(forInfoDictionaryKey: "GoogleBooksApiKey"))
+         * ```
+         *
+         * @param googleBooksApiKey Google Books API key for authenticated requests
+         * @return Configured BookRepository ready for use
+         */
+        fun create(googleBooksApiKey: String): BookRepository {
+            return BookRepository(
+                googleBooksApi = GoogleBooksApi(googleBooksApiKey),
+                openLibraryApi = OpenLibraryApi(),
+                cache = BookCache()
+            )
+        }
+    }
 }
