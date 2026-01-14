@@ -5,10 +5,12 @@
 build/
 !gradle/wrapper/gradle-wrapper.jar
 local.properties
+gradle.properties.local
 
 # IDE
 .idea/
 *.iml
+.fleet/
 
 # Kotlin
 *.class
@@ -19,9 +21,40 @@ local.properties
 *.apk
 *.ap_
 *.dex
+*.aab
+.cxx/
+captures/
 
 # iOS
 *.xcuserdata/
+xcuserdata/
 *.xcworkspace/
+!*.xcworkspace/contents.xcworkspacedata
 DerivedData/
 *.framework/
+*.xcframework/
+Pods/
+*.moved-aside
+*.pbxuser
+*.mode1v3
+*.mode2v3
+*.perspectivev3
+!default.pbxuser
+!default.mode1v3
+!default.mode2v3
+!default.perspectivev3
+xcshareddata/
+*.hmap
+*.ipa
+*.dSYM.zip
+*.dSYM
+
+# KMP specific
+shared/build/
+kotlin-js-store/
+
+# Secrets
+*.keystore
+*.jks
+google-services.json
+GoogleService-Info.plist
