@@ -20,24 +20,29 @@ class FeedViewModel: ObservableObject {
     }
 
     func loadInitialBooks() async {
-        guard !isLoading else { return }
+        print("Loading initial books")
+        guard !isLoading else {
+            print("Already loading, returning")
+            return
+        }
 
         isLoading = true
         currentPage = 0
 
         do {
             // Load first page with hardcoded "fantasy" query for MVP
-            let result = try await repository?.searchBooks(query: "fantasy")
-
-            switch result {
-            case .success(let bookList):
-                if let kotlinBooks = bookList as? [Book] {
-                    books = kotlinBooks
-                }
-            case .failure(let error):
-                print("Error loading initial books: \(error)")
-            case .none:
+            guard let repo = repository else {
                 print("Repository not initialized")
+                isLoading = false
+                return
+            }
+
+            let bookList = try await repo.searchBooksOrThrow(query: "fantasy")
+            if let kotlinBooks = bookList as? [Book] {
+                books = kotlinBooks
+                print("loaded \(books.count) books!")
+            } else {
+                print("Failed to cast book list to [Book]")
             }
         } catch {
             print("Error loading initial books: \(error)")
@@ -56,19 +61,16 @@ class FeedViewModel: ObservableObject {
             // Load next page of books
             // For MVP, we continue with "fantasy" query
             // In Phase 8 (Feed Personalization), this will use user preferences
-            let result = try await repository?.searchBooks(query: "fantasy")
-
-            switch result {
-            case .success(let bookList):
-                if let kotlinBooks = bookList as? [Book] {
-                    books.append(contentsOf: kotlinBooks)
-                }
-            case .failure(let error):
-                print("Error loading more books: \(error)")
-                currentPage -= 1 // Rollback page increment on failure
-            case .none:
+            guard let repo = repository else {
                 print("Repository not initialized")
                 currentPage -= 1
+                isLoading = false
+                return
+            }
+
+            let bookList = try await repo.searchBooksOrThrow(query: "fantasy")
+            if let kotlinBooks = bookList as? [Book] {
+                books.append(contentsOf: kotlinBooks)
             }
         } catch {
             print("Error loading more books: \(error)")

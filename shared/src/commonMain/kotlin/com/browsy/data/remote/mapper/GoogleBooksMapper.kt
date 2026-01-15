@@ -42,9 +42,9 @@ object GoogleBooksMapper {
             id = id,
             title = info.title,
             author = info.authors?.firstOrNull() ?: "Unknown Author",
-            coverUrl = info.imageLinks?.large
+            coverUrl = (info.imageLinks?.large
                 ?: info.imageLinks?.medium
-                ?: info.imageLinks?.thumbnail,
+                ?: info.imageLinks?.thumbnail)?.toHttps(),
             description = info.description,
             publishedDate = info.publishedDate,
             pageCount = info.pageCount,
@@ -77,5 +77,22 @@ object GoogleBooksMapper {
      */
     private fun extractIsbn10(identifiers: List<IndustryIdentifier>?): String? {
         return identifiers?.firstOrNull { it.type == "ISBN_10" }?.identifier
+    }
+
+    /**
+     * Converts an HTTP URL to HTTPS.
+     *
+     * Google Books API sometimes returns HTTP URLs for cover images, which causes
+     * iOS App Transport Security (ATS) to block the request. This extension ensures
+     * all cover URLs use HTTPS.
+     *
+     * @return URL with https:// scheme, or original if already HTTPS or not HTTP
+     */
+    private fun String.toHttps(): String {
+        return if (startsWith("http://")) {
+            replaceFirst("http://", "https://")
+        } else {
+            this
+        }
     }
 }

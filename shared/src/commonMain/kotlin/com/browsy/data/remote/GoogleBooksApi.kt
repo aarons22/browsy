@@ -61,11 +61,18 @@ class GoogleBooksApi(private val apiKey: String) {
         maxResults: Int = 20
     ): Result<GoogleBooksResponse> {
         return try {
-            val response = client.get(baseUrl) {
+            val httpResponse = client.get(baseUrl) {
                 parameter("q", query)
                 parameter("maxResults", maxResults)
                 parameter("key", apiKey)
-            }.body<GoogleBooksResponse>()
+            }
+
+            if (httpResponse.status.value !in 200..299) {
+                val errorBody = httpResponse.body<String>()
+                return Result.failure(Exception("Google Books API error ${httpResponse.status.value}: $errorBody"))
+            }
+
+            val response = httpResponse.body<GoogleBooksResponse>()
             Result.success(response)
         } catch (e: Exception) {
             Result.failure(e)

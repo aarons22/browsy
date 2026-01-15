@@ -10,16 +10,19 @@ struct BookFeedView: View {
                 Text("Loading books...")
                     .foregroundColor(.gray)
             } else {
-                TabView {
-                    ForEach(Array(viewModel.books.enumerated()), id: \.element.id) { index, book in
-                        BookCoverCard(book: book, index: index, viewModel: viewModel)
-                            .onAppear {
-                                viewModel.onBookAppear(index: index)
-                            }
+                ScrollView(.vertical, showsIndicators: false) {
+                    LazyVStack(spacing: 0) {
+                        ForEach(Array(viewModel.books.enumerated()), id: \.element.id) { index, book in
+                            BookCoverCard(book: book, index: index, viewModel: viewModel)
+                                .containerRelativeFrame(.vertical)
+                                .onAppear {
+                                    viewModel.onBookAppear(index: index)
+                                }
+                        }
                     }
+                    .scrollTargetLayout()
                 }
-                .tabViewStyle(.page(indexDisplayMode: .never))
-                .indexViewStyle(.page(backgroundDisplayMode: .never))
+                .scrollTargetBehavior(.paging)
             }
         }
         .task {
