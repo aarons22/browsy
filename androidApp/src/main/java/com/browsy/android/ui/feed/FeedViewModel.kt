@@ -2,6 +2,7 @@ package com.browsy.android.ui.feed
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.browsy.config.BuildKonfig
 import com.browsy.data.model.Book
 import com.browsy.data.repository.BookRepository
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -23,10 +24,6 @@ import kotlinx.coroutines.launch
  * - Prefetches when user is 5 books from the end
  * - Prevents concurrent loads with isLoading flag
  *
- * API key note:
- * - Currently hardcoded for MVP (user provides their own key)
- * - Phase 5 will add proper secrets management
- *
  * @property repository BookRepository instance for fetching books
  * @property _books Mutable state holding the current list of books
  * @property books Public read-only StateFlow of books
@@ -35,9 +32,7 @@ import kotlinx.coroutines.launch
  */
 class FeedViewModel : ViewModel() {
 
-    // TODO: Replace with user's own Google Books API key
-    // Get your free API key at: https://console.cloud.google.com/
-    private val repository = BookRepository.create(googleBooksApiKey = "YOUR_API_KEY_HERE")
+    private val repository = BookRepository.create(googleBooksApiKey = BuildKonfig.GOOGLE_BOOKS_API_KEY)
 
     private val _books = MutableStateFlow<List<Book>>(emptyList())
     val books: StateFlow<List<Book>> = _books.asStateFlow()
