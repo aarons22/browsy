@@ -37,96 +37,101 @@ struct BookCoverCard: View {
     let viewModel: FeedViewModel
 
     var body: some View {
-        ZStack {
-            // Book cover image
-            if let coverUrl = book.coverUrl, let url = URL(string: coverUrl) {
-                AsyncImage(url: url) { phase in
-                    switch phase {
-                    case .empty:
-                        Color.gray.opacity(0.3)
-                            .overlay(
-                                ProgressView()
-                            )
-                    case .success(let image):
-                        image
-                            .resizable()
-                            .aspectRatio(contentMode: .fill)
-                    case .failure:
-                        Color.gray.opacity(0.3)
-                            .overlay(
-                                VStack {
-                                    Image(systemName: "book.closed")
-                                        .font(.system(size: 60))
-                                        .foregroundColor(.gray)
-                                    Text("Cover not available")
-                                        .font(.caption)
-                                        .foregroundColor(.gray)
-                                }
-                            )
-                    @unknown default:
-                        EmptyView()
-                    }
-                }
-            } else {
-                // Fallback for books without cover URL
-                Color.gray.opacity(0.3)
-                    .overlay(
-                        VStack {
-                            Image(systemName: "book.closed")
-                                .font(.system(size: 60))
-                                .foregroundColor(.gray)
-                            Text("No cover available")
-                                .font(.caption)
-                                .foregroundColor(.gray)
-                        }
-                    )
-            }
+        GeometryReader { geometry in
+            ZStack {
+                // Book cover image - extends into safe areas
+                bookCoverImage
+                    .frame(width: geometry.size.width, height: geometry.size.height)
+                    .clipped()
 
-            // Bottom overlay with title, author, and TBR button
-            VStack {
-                Spacer()
-
-                HStack(alignment: .bottom) {
-                    VStack(alignment: .leading, spacing: 4) {
-                        Text(book.title)
-                            .font(.headline)
-                            .foregroundColor(.white)
-                            .lineLimit(2)
-
-                        Text(book.author)
-                            .font(.subheadline)
-                            .foregroundColor(.white.opacity(0.9))
-                            .lineLimit(1)
-                    }
-
+                // Bottom overlay with title, author, and TBR button
+                VStack {
                     Spacer()
 
-                    // TBR button (non-functional for now - Phase 4 will implement)
-                    Button(action: {
-                        // Placeholder - will be implemented in Phase 4
-                    }) {
-                        Image(systemName: "heart")
-                            .font(.system(size: 24))
-                            .foregroundColor(.white)
-                            .padding(12)
-                            .background(Color.black.opacity(0.5))
-                            .clipShape(Circle())
+                    HStack(alignment: .bottom, spacing: 12) {
+                        // Title and author - constrained to prevent overflow
+                        VStack(alignment: .leading, spacing: 4) {
+                            Text(book.title)
+                                .font(.headline)
+                                .foregroundColor(.white)
+                                .lineLimit(2)
+                                .truncationMode(.tail)
+
+                            Text(book.author)
+                                .font(.subheadline)
+                                .foregroundColor(.white.opacity(0.9))
+                                .lineLimit(1)
+                                .truncationMode(.tail)
+                        }
+                        .frame(maxWidth: .infinity, alignment: .leading)
+
+                        // TBR button (non-functional for now - Phase 4 will implement)
+                        Button(action: {
+                            // Placeholder - will be implemented in Phase 4
+                        }) {
+                            Image(systemName: "heart")
+                                .font(.system(size: 24))
+                                .foregroundColor(.white)
+                                .padding(12)
+                                .background(Color.black.opacity(0.5))
+                                .clipShape(Circle())
+                        }
+                        .fixedSize()
                     }
-                }
-                .padding(.horizontal, 20)
-                .padding(.bottom, 40)
-                .background(
-                    LinearGradient(
-                        gradient: Gradient(colors: [.clear, .black.opacity(0.7)]),
-                        startPoint: .top,
-                        endPoint: .bottom
+                    .padding(.horizontal, 20)
+                    .padding(.bottom, 40)
+                    .frame(maxWidth: .infinity)
+                    .background(
+                        LinearGradient(
+                            gradient: Gradient(colors: [.clear, .black.opacity(0.7)]),
+                            startPoint: .top,
+                            endPoint: .bottom
+                        )
+                        .frame(height: 200)
                     )
-                    .frame(height: 200)
-                )
+                }
             }
         }
-        .frame(maxWidth: .infinity, maxHeight: .infinity)
-        .edgesIgnoringSafeArea(.all)
+        .ignoresSafeArea()
+    }
+
+    @ViewBuilder
+    private var bookCoverImage: some View {
+        if let coverUrl = book.coverUrl, let url = URL(string: coverUrl) {
+            AsyncImage(url: url) { phase in
+                switch phase {
+                case .empty:
+                    Color.gray.opacity(0.3)
+                        .overlay(
+                            ProgressView()
+                        )
+                case .success(let image):
+                    image
+                        .resizable()
+                        .aspectRatio(contentMode: .fill)
+                case .failure:
+                    placeholderView(message: "Cover not available")
+                @unknown default:
+                    EmptyView()
+                }
+            }
+        } else {
+            placeholderView(message: "No cover available")
+        }
+    }
+
+    private func placeholderView(message: String) -> some View {
+        Color.gray.opacity(0.3)
+            .overlay(
+                VStack {
+                    Image(systemName: "book.closed")
+                        .font(.system(size: 60))
+                        .foregroundColor(.gray)
+                    Text(message)
+                        .font(.caption)
+                        .foregroundColor(.gray)
+                }
+            )
     }
 }
 
