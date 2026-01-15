@@ -1,6 +1,10 @@
+import com.codingfeline.buildkonfig.compiler.FieldSpec.Type.STRING
+import java.util.Properties
+
 plugins {
     alias(libs.plugins.kotlinMultiplatform)
     alias(libs.plugins.androidLibrary)
+    alias(libs.plugins.buildkonfig)
     kotlin("plugin.serialization") version "2.0.0"
 }
 
@@ -40,6 +44,25 @@ kotlin {
         iosMain.dependencies {
             implementation(libs.ktor.client.darwin)
         }
+    }
+}
+
+buildkonfig {
+    packageName = "com.browsy.config"
+
+    // Read from local.properties (development) or environment variable (CI)
+    val localProperties = Properties()
+    val localPropertiesFile = rootProject.file("local.properties")
+    if (localPropertiesFile.exists()) {
+        localPropertiesFile.inputStream().use { localProperties.load(it) }
+    }
+
+    val apiKey = localProperties.getProperty("google.books.api.key")
+        ?: System.getenv("GOOGLE_BOOKS_API_KEY")
+        ?: ""
+
+    defaultConfigs {
+        buildConfigField(STRING, "GOOGLE_BOOKS_API_KEY", apiKey)
     }
 }
 
