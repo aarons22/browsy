@@ -79,7 +79,7 @@ class FeedViewModel : ViewModel() {
      * Loads the next page of books and appends to current list.
      *
      * Only loads if not currently loading to prevent race conditions.
-     * Increments page counter and appends results to existing books.
+     * Uses startIndex parameter for proper pagination.
      */
     fun loadMoreBooks() {
         if (_isLoading.value) return
@@ -88,11 +88,15 @@ class FeedViewModel : ViewModel() {
             _isLoading.value = true
             try {
                 // For MVP, continue loading fantasy books
-                // Future: Use pagination offset or search with page parameter
-                val result = repository.searchBooks("fantasy page:$currentPage")
+                // Use startIndex for proper pagination
+                val startIndex = _books.value.size
+                val result = repository.searchBooks("fantasy", startIndex = startIndex)
                 result.onSuccess { bookList ->
                     if (bookList.isNotEmpty()) {
-                        _books.value = _books.value + bookList
+                        // Filter out any books that are already in our list (deduplicate by ID)
+                        val existingIds = _books.value.map { it.id }.toSet()
+                        val newBooks = bookList.filter { it.id !in existingIds }
+                        _books.value = _books.value + newBooks
                         currentPage++
                     }
                 }

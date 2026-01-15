@@ -54,16 +54,19 @@ class GoogleBooksApi(private val apiKey: String) {
      *
      * @param query Search query string (supports Google Books query syntax)
      * @param maxResults Maximum number of results to return (1-40, default 20)
+     * @param startIndex Index of first result to return (for pagination, default 0)
      * @return Result containing GoogleBooksResponse on success, or exception on failure
      */
     suspend fun searchBooks(
         query: String,
-        maxResults: Int = 20
+        maxResults: Int = 20,
+        startIndex: Int = 0
     ): Result<GoogleBooksResponse> {
         return try {
             val httpResponse = client.get(baseUrl) {
                 parameter("q", query)
                 parameter("maxResults", maxResults)
+                parameter("startIndex", startIndex)
                 parameter("key", apiKey)
             }
 

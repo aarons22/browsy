@@ -19,6 +19,18 @@ suspend fun BookRepository.searchBooksOrThrow(query: String): List<Book> {
 }
 
 /**
+ * Searches for books matching the given query with pagination support.
+ * Throws an exception on failure instead of returning Result.
+ *
+ * @param query Search query string
+ * @param startIndex Index of first result to return (for pagination)
+ */
+@Throws(Exception::class)
+suspend fun BookRepository.searchBooksOrThrow(query: String, startIndex: Int): List<Book> {
+    return searchBooks(query, startIndex).getOrThrow()
+}
+
+/**
  * Fetches book details by ISBN.
  * Throws an exception on failure instead of returning Result.
  */

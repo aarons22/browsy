@@ -55,26 +55,28 @@ class FeedViewModel: ObservableObject {
         guard !isLoading else { return }
 
         isLoading = true
-        currentPage += 1
 
         do {
-            // Load next page of books
+            // Load next page of books using startIndex for pagination
             // For MVP, we continue with "fantasy" query
             // In Phase 8 (Feed Personalization), this will use user preferences
             guard let repo = repository else {
                 print("Repository not initialized")
-                currentPage -= 1
                 isLoading = false
                 return
             }
 
-            let bookList = try await repo.searchBooksOrThrow(query: "fantasy")
+            let startIndex = Int32(books.count)
+            let bookList = try await repo.searchBooksOrThrow(query: "fantasy", startIndex: startIndex)
             if let kotlinBooks = bookList as? [Book] {
-                books.append(contentsOf: kotlinBooks)
+                // Filter out any books that are already in our list (deduplicate by ID)
+                let existingIds = Set(books.map { $0.id })
+                let newBooks = kotlinBooks.filter { !existingIds.contains($0.id) }
+                books.append(contentsOf: newBooks)
+                currentPage += 1
             }
         } catch {
             print("Error loading more books: \(error)")
-            currentPage -= 1 // Rollback page increment on failure
         }
 
         isLoading = false

@@ -56,7 +56,7 @@ class BookRepository(
      * Searches for books matching the given query.
      *
      * Search strategy:
-     * 1. Check cache for previously fetched results
+     * 1. Check cache for previously fetched results (only for first page)
      * 2. Query Google Books API (supports full search syntax)
      * 3. If Google Books returns no results, return empty list
      *    (Open Library doesn't have general search, only ISBN lookup)
@@ -66,22 +66,28 @@ class BookRepository(
      * supports ISBN-based lookup, not general text search.
      *
      * @param query Search query (supports Google Books query syntax: intitle:, inauthor:, isbn:, etc.)
+     * @param startIndex Index of first result to return (for pagination, default 0)
      * @return Result with list of matching books, or empty list if none found
      */
-    suspend fun searchBooks(query: String): Result<List<Book>> {
-        // Check cache first
-        val cacheKey = "search:$query"
-        cache.get(cacheKey)?.let { return Result.success(listOf(it)) }
+    suspend fun searchBooks(query: String, startIndex: Int = 0): Result<List<Book>> {
+        // Check cache first (only for first page)
+        if (startIndex == 0) {
+            val cacheKey = "search:$query"
+            cache.get(cacheKey)?.let { return Result.success(listOf(it)) }
+        }
 
         // Try Google Books first
-        val googleResult = googleBooksApi.searchBooks(query)
+        val googleResult = googleBooksApi.searchBooks(query, startIndex = startIndex)
         if (googleResult.isSuccess) {
             val books = googleResult.getOrNull()?.items?.map {
                 GoogleBooksMapper.run { it.toBook() }
             }.orEmpty()
 
             if (books.isNotEmpty()) {
-                books.firstOrNull()?.let { cache.put(cacheKey, it) }
+                // Cache first result from first page only
+                if (startIndex == 0) {
+                    books.firstOrNull()?.let { cache.put("search:$query", it) }
+                }
                 return Result.success(books)
             }
         }
