@@ -9,29 +9,30 @@ See: .planning/PROJECT.md (updated 2026-01-14)
 
 ## Current Position
 
-Phase: 2 of 8 (Book Data Layer) - IN PROGRESS
-Plan: 4 of TBD in current phase
+Phase: 3 of 8 (Core UI - Main Feed) - IN PROGRESS
+Plan: 1 of TBD in current phase
 Status: In progress
-Last activity: 2026-01-14 — Completed 02-04-PLAN.md
+Last activity: 2026-01-15 — Completed 03-01-PLAN.md
 
-Progress: ██████░░░░ 60%
+Progress: ███████░░░ 62%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 6
-- Average duration: 8 min
-- Total execution time: 57 min
+- Total plans completed: 7
+- Average duration: 7 min
+- Total execution time: 62 min
 
 **By Phase:**
 
 | Phase | Plans | Total | Avg/Plan |
 |-------|-------|-------|----------|
 | 01-foundation | 3/3 | 35 min | 12 min |
-| 02-book-data-layer | 3/TBD | 22 min | 7 min |
+| 02-book-data-layer | 4/4 | 22 min | 6 min |
+| 03-core-ui-main-feed | 1/TBD | 5 min | 5 min |
 
 **Recent Trend:**
-- Last 5 plans: 01-03 (15 min), 02-01 (12 min), 02-02 (8 min), 02-03 (8 min), 02-04 (2 min)
+- Last 5 plans: 02-01 (12 min), 02-02 (8 min), 02-03 (8 min), 02-04 (2 min), 03-01 (5 min)
 - Trend: Accelerating velocity on well-scoped implementation plans
 
 ## Accumulated Context
@@ -68,6 +69,10 @@ Recent decisions affecting current work:
 | 02-04 | LRU cache with 30-min TTL | Balances data freshness with reduced API calls |
 | 02-04 | Dual-API fallback | Google Books primary, Open Library fallback for ISBN lookups |
 | 02-04 | expect/actual for time | Platform-specific currentTimeMillis() enables KMP-compatible caching |
+| 03-01 | TabView for iOS 16 | TabView + PageTabViewStyle works on iOS 16; scrollTargetBehavior requires iOS 17+ |
+| 03-01 | Hardcoded "fantasy" query | MVP simplicity; Phase 8 will add user preferences |
+| 03-01 | API key placeholder | Users must provide their own Google Books API key for testing |
+| 03-01 | TBR button non-functional | Visible for UX preview; Phase 4 will implement action |
 
 ### Deferred Issues
 
@@ -83,7 +88,7 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-01-14T23:38:43Z
-Stopped at: Completed 02-04-PLAN.md
+Last session: 2026-01-15T13:14:24Z
+Stopped at: Completed 03-01-PLAN.md
 Resume file: None
-Next: Continue with next plan in Phase 02-book-data-layer
+Next: Continue with next plan in Phase 03-core-ui-main-feed
