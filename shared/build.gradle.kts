@@ -49,6 +49,7 @@ kotlin {
 
 buildkonfig {
     packageName = "com.browsy.config"
+    exposeObjectWithName = "BuildKonfig"
 
     // Read from local.properties (development) or environment variable (CI)
     val localProperties = Properties()
