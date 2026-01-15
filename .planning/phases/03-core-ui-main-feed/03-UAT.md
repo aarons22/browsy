@@ -71,3 +71,6 @@ skipped: 0
 
 - UAT-006: iOS book cover not extending into safe areas (major) - Test 2
   note: Previous fix (03-FIX) incomplete - .ignoresSafeArea() not working as expected
+  root_cause: .ignoresSafeArea() applied to child BookCoverCard but ScrollView container blocks safe area extension
+  file: iosApp/iosApp/BookFeedView.swift
+  fix: Apply .ignoresSafeArea() to the ScrollView itself, not just the child views
