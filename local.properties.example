@@ -1,0 +1,9 @@
+# Android SDK location (required for Android builds)
+sdk.dir=/path/to/android-sdk
+
+# Google Books API Key (required for app functionality)
+# Get your key at: https://console.cloud.google.com/
+# 1. Create/select project
+# 2. Enable "Books API"
+# 3. Create API key in Credentials
+google.books.api.key=YOUR_API_KEY_HERE
