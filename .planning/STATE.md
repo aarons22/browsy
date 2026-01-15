@@ -10,18 +10,18 @@ See: .planning/PROJECT.md (updated 2026-01-14)
 ## Current Position
 
 Phase: 3 of 8 (Core UI - Main Feed) - IN PROGRESS
-Plan: 2 of TBD in current phase
-Status: In progress
-Last activity: 2026-01-15 — Completed 03-02-PLAN.md (Android feed implementation)
+Plan: FIX complete (3/3 tasks)
+Status: In progress - UAT issues resolved
+Last activity: 2026-01-15 — Completed 03-FIX.md (5 UAT issues fixed)
 
 Progress: ███████░░░ 65%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 8
+- Total plans completed: 9
 - Average duration: 9 min
-- Total execution time: 82 min
+- Total execution time: 92 min
 
 **By Phase:**
 
@@ -29,11 +29,11 @@ Progress: ███████░░░ 65%
 |-------|-------|-------|----------|
 | 01-foundation | 3/3 | 35 min | 12 min |
 | 02-book-data-layer | 4/4 | 22 min | 6 min |
-| 03-core-ui-main-feed | 2/TBD | 25 min | 13 min |
+| 03-core-ui-main-feed | 3/TBD | 35 min | 12 min |
 
 **Recent Trend:**
-- Last 5 plans: 02-02 (8 min), 02-03 (8 min), 02-04 (2 min), 03-01 (5 min), 03-02 (20 min)
-- Trend: UI implementation plans take longer due to component complexity
+- Last 5 plans: 02-03 (8 min), 02-04 (2 min), 03-01 (5 min), 03-02 (20 min), 03-FIX (10 min)
+- Trend: Fix plans efficient when issues are well-diagnosed
 
 ## Accumulated Context
 
@@ -77,6 +77,9 @@ Recent decisions affecting current work:
 | 03-02 | Compose BOM 2024.06.00 | Upgraded from 2024.01.00 for better VerticalPager API compatibility |
 | 03-02 | pageContent parameter | Used for VerticalPager instead of trailing lambda for BOM version compatibility |
 | 03-02 | ViewModel per screen | FeedViewModel manages feed state; follows Android recommended architecture |
+| 03-FIX | startIndex pagination | Google Books API requires startIndex parameter for proper pagination |
+| 03-FIX | .ignoresSafeArea() | Modern SwiftUI replacement for deprecated .edgesIgnoringSafeArea() |
+| 03-FIX | Deduplication by ID | Both platforms filter duplicates when appending pagination results |
 
 ### Deferred Issues
 
@@ -92,7 +95,7 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-01-15T14:32:17Z
-Stopped at: Completed 03-02-PLAN.md (Android vertical book feed)
+Last session: 2026-01-15T21:01:00Z
+Stopped at: Completed 03-FIX.md (all 5 UAT issues resolved)
 Resume file: None
-Next: Continue with next plan in Phase 03-core-ui-main-feed (likely iOS refinements or shared components)
+Next: Re-verify with /gsd:verify-work 3 to confirm fixes, then continue Phase 03
