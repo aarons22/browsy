@@ -12,9 +12,7 @@ class FeedViewModel: ObservableObject {
     private let prefetchThreshold = 5
 
     init() {
-        // Initialize repository with API key placeholder
-        // User will need to provide their own Google Books API key
-        repository = BookRepository.companion.create(googleBooksApiKey: "YOUR_API_KEY_HERE")
+        repository = BookRepository.companion.create(googleBooksApiKey: BuildKonfig.shared.GOOGLE_BOOKS_API_KEY)
     }
 
     deinit {
