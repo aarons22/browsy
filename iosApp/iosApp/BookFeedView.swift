@@ -23,6 +23,7 @@ struct BookFeedView: View {
                     .scrollTargetLayout()
                 }
                 .scrollTargetBehavior(.paging)
+                .ignoresSafeArea()
             }
         }
         .task {
