@@ -5,23 +5,23 @@
 See: .planning/PROJECT.md (updated 2026-01-14)
 
 **Core value:** The swipe experience must feel like browsing shelves in a bookstore — full-screen covers, smooth transitions, one book at a time, never rushed.
-**Current focus:** Phase 1 — Foundation
+**Current focus:** Phase 4 — Book Info & Actions
 
 ## Current Position
 
-Phase: 3 of 8 (Core UI - Main Feed) - COMPLETE
-Plan: FIX2 complete (1/1 tasks)
-Status: Phase complete - all UAT issues resolved
-Last activity: 2026-01-15 — Completed 03-FIX2.md (safe area fix)
+Phase: 4 of 8 (Book Info & Actions) - IN PROGRESS
+Plan: 01 complete (3/3 tasks) - Local Shelf Storage
+Status: Plan 04-01 complete - ready for Plan 04-02
+Last activity: 2026-01-16 — Completed 04-01-PLAN.md (local shelf storage)
 
-Progress: ███████░░░ 65%
+Progress: ███████░░░ 68%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 9
-- Average duration: 9 min
-- Total execution time: 92 min
+- Total plans completed: 10
+- Average duration: 10 min
+- Total execution time: 104 min
 
 **By Phase:**
 
@@ -29,11 +29,12 @@ Progress: ███████░░░ 65%
 |-------|-------|-------|----------|
 | 01-foundation | 3/3 | 35 min | 12 min |
 | 02-book-data-layer | 4/4 | 22 min | 6 min |
-| 03-core-ui-main-feed | 3/TBD | 35 min | 12 min |
+| 03-core-ui-main-feed | 3/3 | 35 min | 12 min |
+| 04-book-info-actions | 1/TBD | 12 min | 12 min |
 
 **Recent Trend:**
-- Last 5 plans: 02-03 (8 min), 02-04 (2 min), 03-01 (5 min), 03-02 (20 min), 03-FIX (10 min)
-- Trend: Fix plans efficient when issues are well-diagnosed
+- Last 5 plans: 02-04 (2 min), 03-01 (5 min), 03-02 (20 min), 03-FIX (10 min), 04-01 (12 min)
+- Trend: Data layer plans remain efficient
 
 ## Accumulated Context
 
@@ -81,6 +82,9 @@ Recent decisions affecting current work:
 | 03-FIX | .ignoresSafeArea() | Modern SwiftUI replacement for deprecated .edgesIgnoringSafeArea() |
 | 03-FIX | Deduplication by ID | Both platforms filter duplicates when appending pagination results |
 | 03-FIX2 | ignoresSafeArea on container | Apply to ScrollView not child views for proper safe area extension |
+| 04-01 | Public initializer pattern | BookShelfStorageInitializer wraps internal storage init for cross-module access |
+| 04-01 | toggleShelf method | Convenient for UI toggle actions; returns new state for immediate feedback |
+| 04-01 | Error handling in storage load | Try/catch in loadFromStorage prevents crashes from corrupted JSON |
 
 ### Deferred Issues
 
@@ -96,7 +100,7 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-01-15T21:27:00Z
-Stopped at: Completed Phase 03 (Core UI - Main Feed)
+Last session: 2026-01-16T14:42:00Z
+Stopped at: Completed Plan 04-01 (Local Shelf Storage)
 Resume file: None
-Next: Plan Phase 04 (Book Info & Actions)
+Next: Execute Plan 04-02 (Book Info Screen UI)
