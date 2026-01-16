@@ -3,6 +3,8 @@ import shared
 
 struct BookFeedView: View {
     @StateObject private var viewModel = FeedViewModel()
+    @State private var selectedBook: Book? = nil
+    @State private var showingInfo: Bool = false
 
     var body: some View {
         ZStack {
@@ -18,6 +20,10 @@ struct BookFeedView: View {
                                 .onAppear {
                                     viewModel.onBookAppear(index: index)
                                 }
+                                .onTapGesture {
+                                    selectedBook = book
+                                    showingInfo = true
+                                }
                         }
                     }
                     .scrollTargetLayout()
@@ -29,6 +35,13 @@ struct BookFeedView: View {
         .task {
             await viewModel.loadInitialBooks()
         }
+        .sheet(isPresented: $showingInfo) {
+            if let book = selectedBook {
+                BookInfoSheet(book: book)
+                    .presentationDetents([.medium, .large])
+                    .presentationDragIndicator(.visible)
+            }
+        }
     }
 }
 
@@ -36,6 +49,7 @@ struct BookCoverCard: View {
     let book: Book
     let index: Int
     let viewModel: FeedViewModel
+    @StateObject private var shelfViewModel = ShelfViewModel()
 
     var body: some View {
         GeometryReader { geometry in
@@ -66,13 +80,13 @@ struct BookCoverCard: View {
                         }
                         .frame(maxWidth: .infinity, alignment: .leading)
 
-                        // TBR button (non-functional for now - Phase 4 will implement)
+                        // TBR button - toggles shelf state
                         Button(action: {
-                            // Placeholder - will be implemented in Phase 4
+                            shelfViewModel.toggleTBR(bookId: book.id)
                         }) {
-                            Image(systemName: "heart")
+                            Image(systemName: shelfViewModel.isOnTBR ? "heart.fill" : "heart")
                                 .font(.system(size: 24))
-                                .foregroundColor(.white)
+                                .foregroundColor(shelfViewModel.isOnTBR ? .red : .white)
                                 .padding(12)
                                 .background(Color.black.opacity(0.5))
                                 .clipShape(Circle())
@@ -94,6 +108,9 @@ struct BookCoverCard: View {
             }
         }
         .ignoresSafeArea()
+        .onAppear {
+            shelfViewModel.loadState(for: book.id)
+        }
     }
 
     @ViewBuilder

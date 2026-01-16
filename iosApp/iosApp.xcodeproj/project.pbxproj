@@ -11,6 +11,8 @@
 		7555FF8F242A567300829871 /* iOSApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7555FF8E242A567300829871 /* iOSApp.swift */; };
 		C0AC0E992F193C0E000B7BB5 /* BookFeedView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0AC0E982F193C0E000B7BB5 /* BookFeedView.swift */; };
 		C0AC0E9B2F193C13000B7BB5 /* FeedViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0AC0E9A2F193C13000B7BB5 /* FeedViewModel.swift */; };
+		C0AC0E9D2F1A4A01000B7BB5 /* ShelfViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0AC0E9E2F1A4A01000B7BB5 /* ShelfViewModel.swift */; };
+		C0AC0E9F2F1A4A02000B7BB5 /* BookInfoSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0AC0EA02F1A4A02000B7BB5 /* BookInfoSheet.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -20,6 +22,8 @@
 		C0AC0E982F193C0E000B7BB5 /* BookFeedView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BookFeedView.swift; sourceTree = "<group>"; };
 		C0AC0E9A2F193C13000B7BB5 /* FeedViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FeedViewModel.swift; sourceTree = "<group>"; };
 		C0AC0E9C2F193C18000B7BB5 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		C0AC0E9E2F1A4A01000B7BB5 /* ShelfViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShelfViewModel.swift; sourceTree = "<group>"; };
+		C0AC0EA02F1A4A02000B7BB5 /* BookInfoSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BookInfoSheet.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -53,7 +57,9 @@
 			isa = PBXGroup;
 			children = (
 				C0AC0E982F193C0E000B7BB5 /* BookFeedView.swift */,
+				C0AC0EA02F1A4A02000B7BB5 /* BookInfoSheet.swift */,
 				C0AC0E9A2F193C13000B7BB5 /* FeedViewModel.swift */,
+				C0AC0E9E2F1A4A01000B7BB5 /* ShelfViewModel.swift */,
 				7555FF8E242A567300829871 /* iOSApp.swift */,
 				7555FF82242A565900829871 /* ContentView.swift */,
 				C0AC0E9C2F193C18000B7BB5 /* Info.plist */,
@@ -150,8 +156,10 @@
 			buildActionMask = 2147483647;
 			files = (
 				C0AC0E992F193C0E000B7BB5 /* BookFeedView.swift in Sources */,
+				C0AC0E9F2F1A4A02000B7BB5 /* BookInfoSheet.swift in Sources */,
 				7555FF83242A565900829871 /* ContentView.swift in Sources */,
 				C0AC0E9B2F193C13000B7BB5 /* FeedViewModel.swift in Sources */,
+				C0AC0E9D2F1A4A01000B7BB5 /* ShelfViewModel.swift in Sources */,
 				7555FF8F242A567300829871 /* iOSApp.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
