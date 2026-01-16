@@ -74,3 +74,4 @@ skipped: 0
   root_cause: .ignoresSafeArea() applied to child BookCoverCard but ScrollView container blocks safe area extension
   file: iosApp/iosApp/BookFeedView.swift
   fix: Apply .ignoresSafeArea() to the ScrollView itself, not just the child views
+  status: FIXED in 03-FIX2 (commit 15cb13d)
