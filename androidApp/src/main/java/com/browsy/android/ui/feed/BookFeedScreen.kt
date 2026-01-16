@@ -1,6 +1,8 @@
 package com.browsy.android.ui.feed
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -12,6 +14,7 @@ import androidx.compose.foundation.pager.VerticalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Favorite
+import androidx.compose.material.icons.filled.FavoriteBorder
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -20,6 +23,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
@@ -28,6 +34,9 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.AsyncImage
+import com.browsy.android.ui.info.BookInfoBottomSheet
+import com.browsy.android.ui.info.ShelfViewModel
+import com.browsy.data.model.Book
 
 /**
  * BookFeedScreen - Main vertical swipe feed for browsing books.
@@ -38,19 +47,25 @@ import coil.compose.AsyncImage
  * - Snap-to-position behavior (built into VerticalPager)
  * - Infinite scroll with automatic pagination
  * - Title/author overlay with gradient background
- * - Quick TBR action button (non-functional in this phase)
+ * - Quick TBR action button with shelf state
+ * - Tap to show book info bottom sheet
  *
  * Priority #1: Visual quality - covers are displayed at original quality
  * with no downsampling, ensuring crisp beautiful presentation.
  *
  * @param viewModel FeedViewModel managing book state and pagination
  */
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun BookFeedScreen(
     viewModel: FeedViewModel = viewModel()
 ) {
     val books by viewModel.books.collectAsState()
     val isLoading by viewModel.isLoading.collectAsState()
+
+    // State for selected book and bottom sheet
+    var selectedBook by remember { mutableStateOf<Book?>(null) }
+    var showInfoSheet by remember { mutableStateOf(false) }
 
     // Create pager state with dynamic page count
     val pagerState = rememberPagerState(pageCount = { books.size })
@@ -83,8 +98,23 @@ fun BookFeedScreen(
             pageContent = { page ->
                 BookCoverPage(
                     book = books[page],
+                    onBookClick = {
+                        selectedBook = books[page]
+                        showInfoSheet = true
+                    },
                     modifier = Modifier.fillMaxSize()
                 )
+            }
+        )
+    }
+
+    // Book info bottom sheet
+    if (showInfoSheet && selectedBook != null) {
+        BookInfoBottomSheet(
+            book = selectedBook!!,
+            onDismiss = {
+                showInfoSheet = false
+                selectedBook = null
             }
         )
     }
@@ -97,7 +127,8 @@ fun BookFeedScreen(
  * - Full-screen book cover image (high quality, no downsampling)
  * - Bottom gradient overlay (transparent to black)
  * - Book title and author over gradient
- * - Floating TBR button (heart icon, top-right)
+ * - Floating TBR button with shelf state (filled heart when saved)
+ * - Tap gesture to show book info
  *
  * Quality settings (from CONTEXT.md priority):
  * - ContentScale.Crop maintains aspect ratio and fills screen
@@ -105,14 +136,26 @@ fun BookFeedScreen(
  * - Coil handles efficient loading and caching automatically
  *
  * @param book The book to display on this page
+ * @param onBookClick Callback when book cover is tapped
  * @param modifier Modifier for the page container
  */
 @Composable
 fun BookCoverPage(
-    book: com.browsy.data.model.Book,
-    modifier: Modifier = Modifier
+    book: Book,
+    onBookClick: () -> Unit,
+    modifier: Modifier = Modifier,
+    shelfViewModel: ShelfViewModel = viewModel()
 ) {
-    Box(modifier = modifier) {
+    val isOnTBR by shelfViewModel.isOnTBR.collectAsState()
+
+    // Load shelf state when book changes
+    LaunchedEffect(book.id) {
+        shelfViewModel.loadState(book.id)
+    }
+
+    Box(
+        modifier = modifier.clickable { onBookClick() }
+    ) {
         // Full-screen book cover image
         AsyncImage(
             model = book.coverUrl ?: "",
@@ -161,15 +204,15 @@ fun BookCoverPage(
         // TBR/Wishlist floating action button (top-right)
         FloatingActionButton(
             onClick = {
-                // Non-functional for now - Phase 4 implements TBR functionality
+                shelfViewModel.toggleTBR(book.id)
             },
             modifier = Modifier
                 .align(Alignment.TopEnd)
                 .padding(16.dp)
         ) {
             Icon(
-                imageVector = Icons.Default.Favorite,
-                contentDescription = "Add to TBR"
+                imageVector = if (isOnTBR) Icons.Filled.Favorite else Icons.Filled.FavoriteBorder,
+                contentDescription = if (isOnTBR) "Remove from TBR" else "Add to TBR"
             )
         }
     }
