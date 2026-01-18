@@ -1,12 +1,19 @@
 # Multi-stage Docker build for Node.js backend optimized for Cloud Run
+
+# Build stage - compile TypeScript
 FROM node:18-alpine as build
 WORKDIR /app
 
 # Copy package files
 COPY package*.json ./
+COPY tsconfig.json ./
 
-# Install dependencies (production only)
-RUN npm ci --only=production && npm cache clean --force
+# Install all dependencies (including devDependencies for TypeScript compilation)
+RUN npm ci && npm cache clean --force
+
+# Copy source code and build
+COPY src/ ./src/
+RUN npm run build
 
 # Production stage
 FROM node:18-alpine as runtime
@@ -15,16 +22,12 @@ WORKDIR /app
 # Create non-root user for security
 RUN addgroup -g 1001 -S nodejs && adduser -S nodejs -u 1001
 
-# Copy node_modules from build stage
-COPY --from=build --chown=nodejs:nodejs /app/node_modules ./node_modules
+# Install production dependencies only
+COPY package*.json ./
+RUN npm ci --only=production && npm cache clean --force
 
-# Copy source code
-COPY --chown=nodejs:nodejs package*.json ./
-COPY --chown=nodejs:nodejs tsconfig.json ./
-COPY --chown=nodejs:nodejs src/ ./src/
-
-# Install TypeScript globally for ts-node
-RUN npm install -g typescript ts-node
+# Copy compiled JavaScript from build stage
+COPY --from=build --chown=nodejs:nodejs /app/dist ./dist
 
 # Switch to non-root user
 USER nodejs

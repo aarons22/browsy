@@ -4,7 +4,7 @@
   "description": "Node.js backend for Browsy mobile app",
   "main": "dist/app.js",
   "scripts": {
-    "start": "ts-node src/app.ts",
+    "start": "node dist/app.js",
     "dev": "ts-node src/app.ts",
     "build": "tsc",
     "prod": "node dist/app.js",
