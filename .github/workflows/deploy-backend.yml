@@ -1,0 +1,82 @@
+name: Deploy Backend to Firebase Functions
+
+on:
+  push:
+    branches: [ main ]
+    paths:
+      - 'backend/**'
+  pull_request:
+    branches: [ main ]
+    paths:
+      - 'backend/**'
+
+jobs:
+  deploy:
+    name: Deploy to Firebase Functions
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main'
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js 20
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+          cache-dependency-path: backend/package-lock.json
+
+      - name: Install dependencies
+        working-directory: backend
+        run: npm ci
+
+      - name: Build TypeScript
+        working-directory: backend
+        run: npm run build
+
+      - name: Setup Firebase CLI
+        uses: w9jds/setup-firebase@main
+        with:
+          tools-version: 13.0.2
+
+      - name: Authenticate with Firebase
+        env:
+          FIREBASE_TOKEN: ${{ secrets.FIREBASE_TOKEN }}
+        run: |
+          echo "$FIREBASE_TOKEN" | firebase login:ci
+
+      - name: Deploy to Firebase Functions
+        working-directory: backend
+        env:
+          FIREBASE_TOKEN: ${{ secrets.FIREBASE_TOKEN }}
+        run: firebase deploy --only functions --token "$FIREBASE_TOKEN" --non-interactive
+
+  test:
+    name: Test Backend API
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js 20
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+          cache-dependency-path: backend/package-lock.json
+
+      - name: Install dependencies
+        working-directory: backend
+        run: npm ci
+
+      - name: Build TypeScript
+        working-directory: backend
+        run: npm run build
+
+      - name: Run tests (when available)
+        working-directory: backend
+        run: |
+          echo "No tests configured yet - will run npm test when available"
+          # npm test
