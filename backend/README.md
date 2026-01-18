@@ -30,7 +30,15 @@ Node.js Express backend with Firebase integration for the Browsy mobile app.
 
 - `GET /` - API information
 - `GET /health` - Health check with Firebase status
+- `POST /api/shelves/:userId/:shelfType` - Add book to user shelf
+- `DELETE /api/shelves/:userId/:shelfType/:bookId` - Remove book from shelf
+- `GET /api/shelves/:userId/:shelfType` - Get books in user shelf
 
 ## Deployment
 
-The backend is containerized and ready for deployment to Google Cloud Run.
+**Current approach:** Firebase Functions (serverless, auto-scaling)
+```bash
+firebase deploy --only functions
+```
+
+**Future scaling option:** If serverless limits become restrictive, the codebase can be containerized with Docker for deployment to Cloud Run or other container platforms. The Express.js architecture is already compatible with both approaches.
