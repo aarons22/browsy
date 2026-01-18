@@ -10,18 +10,18 @@ See: .planning/PROJECT.md (updated 2026-01-14)
 ## Current Position
 
 Phase: 4 of 8 (Book Info & Actions) - IN PROGRESS
-Plan: 01 complete (3/3 tasks) - Local Shelf Storage
-Status: Plan 04-01 complete - ready for Plan 04-02
-Last activity: 2026-01-16 — Completed 04-01-PLAN.md (local shelf storage)
+Plan: 04 complete (3/3 tasks) - Gap Closure
+Status: 2 of 4 plans complete in Phase 04
+Last activity: 2026-01-18 — Completed 04-04-PLAN.md (UAT gap closure)
 
-Progress: ███████░░░ 68%
+Progress: ███████░░░ 69%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 10
-- Average duration: 10 min
-- Total execution time: 104 min
+- Total plans completed: 11
+- Average duration: 9 min
+- Total execution time: 107 min
 
 **By Phase:**
 
@@ -30,11 +30,11 @@ Progress: ███████░░░ 68%
 | 01-foundation | 3/3 | 35 min | 12 min |
 | 02-book-data-layer | 4/4 | 22 min | 6 min |
 | 03-core-ui-main-feed | 3/3 | 35 min | 12 min |
-| 04-book-info-actions | 1/TBD | 12 min | 12 min |
+| 04-book-info-actions | 2/4 | 15 min | 8 min |
 
 **Recent Trend:**
-- Last 5 plans: 02-04 (2 min), 03-01 (5 min), 03-02 (20 min), 03-FIX (10 min), 04-01 (12 min)
-- Trend: Data layer plans remain efficient
+- Last 5 plans: 03-01 (5 min), 03-02 (20 min), 03-FIX (10 min), 04-01 (12 min), 04-04 (3 min)
+- Trend: Bug fix plans completing rapidly
 
 ## Accumulated Context
 
@@ -85,6 +85,9 @@ Recent decisions affecting current work:
 | 04-01 | Public initializer pattern | BookShelfStorageInitializer wraps internal storage init for cross-module access |
 | 04-01 | toggleShelf method | Convenient for UI toggle actions; returns new state for immediate feedback |
 | 04-01 | Error handling in storage load | Try/catch in loadFromStorage prevents crashes from corrupted JSON |
+| 04-04 | .sheet(item:) for iOS sheets | Avoids race condition by atomically binding presentation to optional data |
+| 04-04 | UUID refresh trigger | Pattern for cross-component state sync without shared ViewModels |
+| 04-04 | Android when block for states | Mutually exclusive loading/error/content branches prevent UI gaps |
 
 ### Deferred Issues
 
@@ -100,7 +103,7 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-01-16T14:42:00Z
-Stopped at: Completed Plan 04-01 (Local Shelf Storage)
+Last session: 2026-01-18T00:12:27Z
+Stopped at: Completed Plan 04-04 (Gap Closure)
 Resume file: None
-Next: Execute Plan 04-02 (Book Info Screen UI)
+Next: TBD - Phase 04 has 2 more plans to review
