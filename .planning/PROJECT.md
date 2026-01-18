@@ -87,6 +87,7 @@ The swipe experience must feel like browsing shelves in a bookstore — full-scr
 - **Tech stack**: Kotlin Multiplatform with native UI (SwiftUI on iOS, Jetpack Compose on Android) — non-negotiable for the experience quality
 - **Book data**: Start with free APIs (Open Library, Google Books) — flexible to paid services later if needed
 - **Backend**: GCP preferred (user is familiar) — but flexible
+- **Architectural approach**: See [CLAUDE.md](../CLAUDE.md) for iOS-first development philosophy and implementation guidelines
 
 ## Key Decisions
 

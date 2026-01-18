@@ -1,5 +1,7 @@
 # iOS Debugging Learnings & Best Practices
 
+*For architectural philosophy and iOS-first development principles, see [CLAUDE.md](../CLAUDE.md).*
+
 ## Core Lessons from FeedStrategy Integration Session
 
 ### 1. Swift/Kotlin Interop Challenges
