@@ -59,3 +59,10 @@ kotlin-js-store/
 google-services.json
 GoogleService-Info.plist
 .kotlin
+
+# Node.js / Backend
+backend/node_modules/
+backend/dist/
+backend/*.log
+backend/.env*
+!backend/.env.example

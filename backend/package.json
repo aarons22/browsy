@@ -4,9 +4,10 @@
   "description": "Node.js backend for Browsy mobile app",
   "main": "dist/app.js",
   "scripts": {
-    "start": "node dist/app.js",
+    "start": "ts-node src/app.ts",
     "dev": "ts-node src/app.ts",
     "build": "tsc",
+    "prod": "node dist/app.js",
     "clean": "rm -rf dist"
   },
   "dependencies": {

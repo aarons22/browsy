@@ -1,0 +1,47 @@
+# Exclude source control
+.git/
+.gitignore
+
+# Exclude development files
+.env*
+!.env.example
+
+# Exclude IDE files
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Exclude OS files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Exclude documentation
+README.md
+*.md
+!backend/README.md
+
+# Exclude non-backend directories for Cloud Run deployment
+androidApp/
+iosApp/
+shared/
+.gradle/
+.kotlin/
+build/
+gradle/
+gradlew*
+gradle.properties*
+settings.gradle.kts
+build.gradle.kts
+wireframe_sketches/
+.planning/
+.devcontainer/
+.claude/
+
+# Include only backend directory contents
+!backend/
