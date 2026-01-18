@@ -42,15 +42,14 @@ class FeedViewModel: ObservableObject {
 
             // Get smart query strategy for current load
             let smartQuery = FeedStrategy.shared.getSmartQuery(loadCount: loadCount)
-            currentQuery = smartQuery.first!
-            currentOrderBy = smartQuery.second
+            currentQuery = String(smartQuery.first!)
+            currentOrderBy = smartQuery.second != nil ? String(smartQuery.second!) : nil
 
             print("Using smart query: '\(currentQuery)' with orderBy: \(currentOrderBy ?? "nil")")
 
             let bookList = try await repo.searchBooksOrThrow(
                 query: currentQuery,
-                startIndex: 0,
-                orderBy: currentOrderBy
+                startIndex: 0
             )
             if let kotlinBooks = bookList as? [Book] {
                 books = kotlinBooks
@@ -84,8 +83,7 @@ class FeedViewModel: ObservableObject {
 
             let bookList = try await repo.searchBooksOrThrow(
                 query: currentQuery,
-                startIndex: startIndex,
-                orderBy: currentOrderBy
+                startIndex: startIndex
             )
             if let kotlinBooks = bookList as? [Book] {
                 // Filter out any books that are already in our list (deduplicate by ID)
