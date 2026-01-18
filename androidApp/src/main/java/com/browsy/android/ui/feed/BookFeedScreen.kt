@@ -2,6 +2,7 @@ package com.browsy.android.ui.feed
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -65,6 +66,7 @@ fun BookFeedScreen(
 ) {
     val books by viewModel.books.collectAsState()
     val isLoading by viewModel.isLoading.collectAsState()
+    val errorMessage by viewModel.errorMessage.collectAsState()
 
     // State for selected book and bottom sheet
     var selectedBook by remember { mutableStateOf<Book?>(null) }
@@ -109,7 +111,8 @@ fun BookFeedScreen(
                     contentAlignment = Alignment.Center
                 ) {
                     Column(
-                        horizontalAlignment = Alignment.CenterHorizontally
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        modifier = Modifier.padding(24.dp)
                     ) {
                         Icon(
                             imageVector = Icons.Default.Warning,
@@ -120,15 +123,27 @@ fun BookFeedScreen(
                         Spacer(modifier = Modifier.height(16.dp))
                         Text(
                             text = "Unable to load books",
-                            style = MaterialTheme.typography.bodyLarge,
+                            style = MaterialTheme.typography.headlineSmall,
                             color = MaterialTheme.colorScheme.onBackground
                         )
                         Spacer(modifier = Modifier.height(8.dp))
+
+                        // Show specific error message if available
                         Text(
-                            text = "Check your internet connection and API key",
+                            text = errorMessage ?: "Check your internet connection and API key",
                             style = MaterialTheme.typography.bodyMedium,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            modifier = Modifier.padding(horizontal = 16.dp)
                         )
+
+                        Spacer(modifier = Modifier.height(24.dp))
+
+                        // Retry button
+                        Button(
+                            onClick = { viewModel.retry() }
+                        ) {
+                            Text("Retry")
+                        }
                     }
                 }
             }

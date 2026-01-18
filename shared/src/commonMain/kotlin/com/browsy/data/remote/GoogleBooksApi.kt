@@ -71,12 +71,16 @@ class GoogleBooksApi(private val apiKey: String) {
     ): Result<GoogleBooksResponse> {
         return try {
             println("GoogleBooksApi: Searching for '$query' (maxResults=$maxResults, startIndex=$startIndex)")
+            println("GoogleBooksApi: Making request to $baseUrl")
+
             val httpResponse = client.get(baseUrl) {
                 parameter("q", query)
                 parameter("maxResults", maxResults)
                 parameter("startIndex", startIndex)
-                parameter("key", apiKey.take(8) + "...")
+                parameter("key", apiKey)
             }
+
+            println("GoogleBooksApi: Response status: ${httpResponse.status}")
 
             if (httpResponse.status.value !in 200..299) {
                 val errorBody = httpResponse.body<String>()
@@ -89,8 +93,18 @@ class GoogleBooksApi(private val apiKey: String) {
             println("GoogleBooksApi: Successfully loaded ${response.totalItems} total items, ${response.items?.size ?: 0} items returned")
             Result.success(response)
         } catch (e: Exception) {
-            println("GoogleBooksApi: Exception during search - ${e.message}")
-            Result.failure(e)
+            val detailedMessage = when {
+                e.message?.contains("Unable to resolve host") == true ->
+                    "DNS resolution failed for googleapis.com. Check internet connection and DNS settings."
+                e.message?.contains("timeout") == true ->
+                    "Request timed out. Check network connection."
+                e.message?.contains("No address associated with hostname") == true ->
+                    "Cannot resolve www.googleapis.com. Check network configuration."
+                else -> "Network error: ${e.message}"
+            }
+            println("GoogleBooksApi: Exception during search - $detailedMessage")
+            println("GoogleBooksApi: Original exception: ${e::class.simpleName}: ${e.message}")
+            Result.failure(Exception(detailedMessage, e))
         }
     }
 
