@@ -1,6 +1,7 @@
 package com.browsy.data.remote.mapper
 
 import com.browsy.data.model.Book
+import com.browsy.data.model.ImageUrlEnhancer
 import com.browsy.data.remote.dto.OpenLibraryBookData
 
 /**
@@ -31,7 +32,9 @@ object OpenLibraryMapper {
             id = "OL:$isbn",
             title = if (subtitle != null) "$title: $subtitle" else title,
             author = authors?.firstOrNull()?.name ?: "Unknown Author",
-            coverUrl = cover?.large ?: cover?.medium ?: cover?.small,
+            coverUrl = ImageUrlEnhancer.enhance(
+                cover?.large ?: cover?.medium ?: cover?.small
+            ),
             description = null, // Open Library doesn't provide description in Books API
             publishedDate = publishDate,
             pageCount = numberOfPages,

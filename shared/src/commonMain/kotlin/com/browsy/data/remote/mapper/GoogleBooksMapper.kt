@@ -1,6 +1,7 @@
 package com.browsy.data.remote.mapper
 
 import com.browsy.data.model.Book
+import com.browsy.data.model.ImageUrlEnhancer
 import com.browsy.data.remote.dto.IndustryIdentifier
 import com.browsy.data.remote.dto.VolumeItem
 
@@ -13,7 +14,7 @@ import com.browsy.data.remote.dto.VolumeItem
  *
  * Mapping strategies:
  * - Authors: Uses first author from list, falls back to "Unknown Author"
- * - Cover images: Prefers larger sizes (extraLarge → large → medium → thumbnail)
+ * - Cover images: Prioritizes high quality with URL enhancement (extraLarge → large → medium → thumbnail + zoom optimization)
  * - ISBN: Prefers ISBN-13 over ISBN-10
  * - Subjects: Maps categories directly to subjects list
  */
@@ -24,7 +25,7 @@ object GoogleBooksMapper {
      *
      * This mapping handles incomplete API data gracefully:
      * - Missing authors default to "Unknown Author"
-     * - Cover URL selection prefers larger images for better quality
+     * - Cover URL selection prioritizes quality with enhancement (zoom optimization for Google Books URLs)
      * - ISBN-13 is preferred over ISBN-10 when both are available
      * - Empty lists are used for missing subjects/categories
      *
@@ -38,14 +39,25 @@ object GoogleBooksMapper {
      */
     fun VolumeItem.toBook(): Book {
         val info = volumeInfo
+        val originalCoverUrl = info.imageLinks?.extraLarge
+            ?: info.imageLinks?.large
+            ?: info.imageLinks?.medium
+            ?: info.imageLinks?.thumbnail
+
+        val enhancedCoverUrl = ImageUrlEnhancer.enhance(originalCoverUrl)?.toHttps()
+
+        // Debug logging to track image quality improvements
+        if (originalCoverUrl != null && enhancedCoverUrl != originalCoverUrl) {
+            println("GoogleBooks: Enhanced image URL for '${info.title}'")
+            println("  Original:  $originalCoverUrl")
+            println("  Enhanced:  $enhancedCoverUrl")
+        }
+
         return Book(
             id = id,
             title = info.title,
             author = info.authors?.firstOrNull() ?: "Unknown Author",
-            coverUrl = (info.imageLinks?.extraLarge
-                ?: info.imageLinks?.large
-                ?: info.imageLinks?.medium
-                ?: info.imageLinks?.thumbnail)?.toHttps(),
+            coverUrl = enhancedCoverUrl,
             description = info.description,
             publishedDate = info.publishedDate,
             pageCount = info.pageCount,
