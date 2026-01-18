@@ -3,8 +3,8 @@ import shared
 
 struct BookFeedView: View {
     @StateObject private var viewModel = FeedViewModel()
+    @StateObject private var shelfViewModel = ShelfViewModel()
     @State private var selectedBook: Book? = nil
-    @State private var shelfRefreshId = UUID()
 
     var body: some View {
         ZStack {
@@ -15,7 +15,7 @@ struct BookFeedView: View {
                 ScrollView(.vertical, showsIndicators: false) {
                     LazyVStack(spacing: 0) {
                         ForEach(Array(viewModel.books.enumerated()), id: \.element.id) { index, book in
-                            BookCoverCard(book: book, index: index, viewModel: viewModel, shelfRefreshId: shelfRefreshId)
+                            BookCoverCard(book: book, index: index, viewModel: viewModel, shelfViewModel: shelfViewModel)
                                 .containerRelativeFrame(.vertical)
                                 .onAppear {
                                     viewModel.onBookAppear(index: index)
@@ -35,10 +35,9 @@ struct BookFeedView: View {
             await viewModel.loadInitialBooks()
         }
         .sheet(item: $selectedBook, onDismiss: {
-            // Trigger shelf state refresh when sheet dismisses
-            shelfRefreshId = UUID()
+            // No need for manual refresh - ShelfViewModel handles it automatically
         }) { book in
-            BookInfoSheet(book: book)
+            BookInfoSheet(book: book, shelfViewModel: shelfViewModel)
                 .presentationDetents([.medium, .large])
                 .presentationDragIndicator(.visible)
         }
@@ -49,8 +48,8 @@ struct BookCoverCard: View {
     let book: Book
     let index: Int
     let viewModel: FeedViewModel
-    let shelfRefreshId: UUID
-    @StateObject private var shelfViewModel = ShelfViewModel()
+    @ObservedObject let shelfViewModel: ShelfViewModel
+    @State private var isOnTBR: Bool = false
 
     var body: some View {
         GeometryReader { geometry in
@@ -85,9 +84,9 @@ struct BookCoverCard: View {
                         Button(action: {
                             shelfViewModel.toggleTBR(bookId: book.id)
                         }) {
-                            Image(systemName: shelfViewModel.isOnTBR ? "heart.fill" : "heart")
+                            Image(systemName: isOnTBR ? "heart.fill" : "heart")
                                 .font(.system(size: 24))
-                                .foregroundColor(shelfViewModel.isOnTBR ? .red : .white)
+                                .foregroundColor(isOnTBR ? .red : .white)
                                 .padding(12)
                                 .background(Color.black.opacity(0.5))
                                 .clipShape(Circle())
@@ -110,11 +109,15 @@ struct BookCoverCard: View {
         }
         .ignoresSafeArea()
         .onAppear {
-            shelfViewModel.loadState(for: book.id)
+            loadTBRState()
         }
-        .onChange(of: shelfRefreshId) { oldValue, newValue in
-            shelfViewModel.loadState(for: book.id)
+        .onChange(of: shelfViewModel.shelfRefreshId) { oldValue, newValue in
+            loadTBRState()
         }
+    }
+
+    private func loadTBRState() {
+        isOnTBR = shelfViewModel.isBookOnTBR(bookId: book.id)
     }
 
     @ViewBuilder
