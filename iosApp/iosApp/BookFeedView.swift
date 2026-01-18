@@ -4,7 +4,6 @@ import shared
 struct BookFeedView: View {
     @StateObject private var viewModel = FeedViewModel()
     @State private var selectedBook: Book? = nil
-    @State private var showingInfo: Bool = false
 
     var body: some View {
         ZStack {
@@ -22,7 +21,6 @@ struct BookFeedView: View {
                                 }
                                 .onTapGesture {
                                     selectedBook = book
-                                    showingInfo = true
                                 }
                         }
                     }
@@ -35,12 +33,10 @@ struct BookFeedView: View {
         .task {
             await viewModel.loadInitialBooks()
         }
-        .sheet(isPresented: $showingInfo) {
-            if let book = selectedBook {
-                BookInfoSheet(book: book)
-                    .presentationDetents([.medium, .large])
-                    .presentationDragIndicator(.visible)
-            }
+        .sheet(item: $selectedBook) { book in
+            BookInfoSheet(book: book)
+                .presentationDetents([.medium, .large])
+                .presentationDragIndicator(.visible)
         }
     }
 }
@@ -152,6 +148,9 @@ struct BookCoverCard: View {
             )
     }
 }
+
+// MARK: - Identifiable Conformance
+extension Book: Identifiable {}
 
 #Preview {
     BookFeedView()
