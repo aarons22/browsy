@@ -58,7 +58,12 @@ This is THE CORE VALUE. If this phase doesn't feel like browsing bookstore shelv
 **Depends on**: Phase 1 (can run parallel to Phases 2-4)
 **Research**: Likely (GCP services setup)
 **Research topics**: Cloud Run setup, Firestore schema design, API design patterns, GCP project configuration
-**Plans**: TBD
+**Plans**: 3 plans
+
+Plans:
+- [ ] 05-01-PLAN.md — GCP Foundation & Node.js Backend Setup
+- [ ] 05-02-PLAN.md — Firestore Integration & API Endpoints
+- [ ] 05-03-PLAN.md — Cloud Run Deployment & CI/CD
 
 ### Phase 6: Authentication
 **Goal**: Users can create accounts and log in with Google, Apple, or Email
@@ -92,7 +97,7 @@ Note: Phase 5 (Backend) can potentially run in parallel with Phases 2-4 since th
 | 2. Book Data Layer | 4/4 | Complete | 2026-01-14 |
 | 3. Core UI - Main Feed | 4/4 | Complete | 2026-01-15 |
 | 4. Book Info & Actions | 4/4 | Complete | 2026-01-18 |
-| 5. Backend Infrastructure | 0/TBD | Not started | - |
+| 5. Backend Infrastructure | 0/3 | Not started | - |
 | 6. Authentication | 0/TBD | Not started | - |
 | 7. User Profile & Shelves | 0/TBD | Not started | - |
 | 8. Feed Personalization | 0/TBD | Not started | - |
