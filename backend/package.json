@@ -1,13 +1,14 @@
 {
   "name": "browsy-backend",
   "version": "1.0.0",
-  "description": "Node.js backend for Browsy mobile app",
-  "main": "dist/app.js",
+  "description": "Firebase Functions backend for Browsy mobile app",
+  "main": "dist/index.js",
   "scripts": {
-    "start": "node dist/app.js",
+    "start": "node dist/index.js",
     "dev": "ts-node src/app.ts",
     "build": "tsc",
-    "prod": "node dist/app.js",
+    "serve": "firebase serve --only functions",
+    "deploy": "firebase deploy --only functions",
     "clean": "rm -rf dist"
   },
   "dependencies": {
@@ -16,6 +17,7 @@
     "dotenv": "^17.2.3",
     "express": "^4.18.2",
     "firebase-admin": "^11.11.1",
+    "firebase-functions": "^4.9.0",
     "helmet": "^7.1.0"
   },
   "devDependencies": {
@@ -28,13 +30,14 @@
     "typescript": "^5.3.3"
   },
   "engines": {
-    "node": ">=18.0.0"
+    "node": "18"
   },
   "keywords": [
     "express",
     "typescript",
     "firebase",
-    "firestore"
+    "firestore",
+    "firebase-functions"
   ],
   "author": "Browsy Team",
   "license": "ISC"

@@ -53,6 +53,6 @@ jspm_packages/
 .node_repl_history
 
 # GCP credentials (should never be committed)
-*.json
 service-account-*.json
 google-credentials.json
+*-service-account.json

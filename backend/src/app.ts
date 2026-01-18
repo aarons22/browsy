@@ -2,28 +2,14 @@ import express from 'express';
 import cors from 'cors';
 import helmet from 'helmet';
 import compression from 'compression';
-import { initializeApp, applicationDefault } from 'firebase-admin/app';
 import { getFirestore } from 'firebase-admin/firestore';
-import dotenv from 'dotenv';
 
 // Routes
 import shelvesRoutes from './routes/shelves';
 
-// Load environment variables
-dotenv.config();
-
-// Initialize Firebase Admin SDK
-// In production, this will use Application Default Credentials
-// In development, set GOOGLE_APPLICATION_CREDENTIALS environment variable
-initializeApp({
-  credential: applicationDefault(),
-  projectId: process.env.FIREBASE_PROJECT_ID || process.env.GOOGLE_CLOUD_PROJECT,
-});
-
 const db = getFirestore();
 
 const app = express();
-const PORT = process.env.PORT || 3001;
 
 // Security middleware
 app.use(helmet());
@@ -42,7 +28,7 @@ app.get('/health', (_req, res) => {
     service: 'browsy-backend',
     firebase: {
       initialized: true,
-      projectId: process.env.FIREBASE_PROJECT_ID || process.env.GOOGLE_CLOUD_PROJECT || 'not-configured'
+      projectId: process.env.GCLOUD_PROJECT || 'not-configured'
     }
   });
 });
@@ -61,12 +47,6 @@ app.get('/', (_req, res) => {
 
 // API Routes
 app.use('/api/shelves', shelvesRoutes);
-
-// Start server
-app.listen(PORT, () => {
-  console.log(`🚀 Browsy backend server started on port ${PORT}`);
-  console.log(`📋 Health check available at: http://localhost:${PORT}/health`);
-});
 
 export default app;
 export { db };
