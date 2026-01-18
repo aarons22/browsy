@@ -116,6 +116,16 @@ browsy/
 
 ## Development
 
+### Development Guidelines
+
+**iOS/Swift Interop Best Practices**: See [iOS Debug Learnings](.planning/iOS_DEBUG_LEARNINGS.md) for detailed guidelines on:
+- Swift-compatible API overloads (always provide explicit overloads)
+- Kotlin→Swift type conversion patterns (`NSString` → `String` casting)
+- Cross-platform testing workflow
+- Code signing workarounds for development builds
+
+**Key Rule**: Always create Swift-compatible overloads when adding new Kotlin API methods to prevent interop issues.
+
 ### Build Commands
 
 ```bash
