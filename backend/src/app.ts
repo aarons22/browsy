@@ -2,12 +2,9 @@ import express from 'express';
 import cors from 'cors';
 import helmet from 'helmet';
 import compression from 'compression';
-import { getFirestore } from 'firebase-admin/firestore';
 
 // Routes
 import shelvesRoutes from './routes/shelves';
-
-const db = getFirestore();
 
 const app = express();
 
@@ -49,4 +46,3 @@ app.get('/', (_req, res) => {
 app.use('/api/shelves', shelvesRoutes);
 
 export default app;
-export { db };

@@ -6,13 +6,14 @@
 import { getFirestore } from 'firebase-admin/firestore';
 import { Book, UserShelf, ShelfType } from '../models';
 
-const db = getFirestore();
+const getDb = () => getFirestore();
 
 /**
  * Add a book to a user's shelf using Firestore transactions.
  * Prevents duplicates and ensures data consistency.
  */
 export const addBookToShelf = async (userId: string, shelfType: ShelfType, book: Book): Promise<void> => {
+  const db = getDb();
   const shelfRef = db.collection('users').doc(userId).collection('shelves').doc(shelfType);
 
   return db.runTransaction(async (transaction) => {
@@ -37,6 +38,7 @@ export const addBookToShelf = async (userId: string, shelfType: ShelfType, book:
  * Remove a book from a user's shelf using Firestore transactions.
  */
 export const removeBookFromShelf = async (userId: string, shelfType: ShelfType, bookId: string): Promise<void> => {
+  const db = getDb();
   const shelfRef = db.collection('users').doc(userId).collection('shelves').doc(shelfType);
 
   return db.runTransaction(async (transaction) => {
@@ -67,6 +69,7 @@ export const removeBookFromShelf = async (userId: string, shelfType: ShelfType, 
  */
 export const getUserShelves = async (userId: string): Promise<UserShelf[]> => {
   try {
+    const db = getDb();
     const shelvesRef = db.collection('users').doc(userId).collection('shelves');
     const snapshot = await shelvesRef.get();
 
@@ -89,6 +92,7 @@ export const getUserShelves = async (userId: string): Promise<UserShelf[]> => {
  */
 export const getShelfBooks = async (userId: string, shelfType: ShelfType): Promise<Book[]> => {
   try {
+    const db = getDb();
     const shelfRef = db.collection('users').doc(userId).collection('shelves').doc(shelfType);
     const doc = await shelfRef.get();
 
