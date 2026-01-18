@@ -2,6 +2,20 @@ import express from 'express';
 import cors from 'cors';
 import helmet from 'helmet';
 import compression from 'compression';
+import admin from 'firebase-admin';
+import dotenv from 'dotenv';
+
+// Load environment variables
+dotenv.config();
+
+// Initialize Firebase Admin SDK
+// In production, this will use Application Default Credentials
+// In development, set GOOGLE_APPLICATION_CREDENTIALS environment variable
+if (!admin.apps.length) {
+  admin.initializeApp({
+    projectId: process.env.FIREBASE_PROJECT_ID || process.env.GOOGLE_CLOUD_PROJECT,
+  });
+}
 
 const app = express();
 const PORT = process.env.PORT || 8080;
@@ -20,7 +34,11 @@ app.get('/health', (_req, res) => {
   res.status(200).json({
     status: 'healthy',
     timestamp: new Date().toISOString(),
-    service: 'browsy-backend'
+    service: 'browsy-backend',
+    firebase: {
+      initialized: admin.apps.length > 0,
+      projectId: admin.apps[0]?.options.projectId || 'not-configured'
+    }
   });
 });
 
