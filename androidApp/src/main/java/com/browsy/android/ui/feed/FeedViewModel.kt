@@ -8,6 +8,7 @@ import android.util.Log
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.browsy.config.BuildKonfig
+import com.browsy.data.feed.FeedStrategy
 import com.browsy.data.model.Book
 import com.browsy.data.repository.BookRepository
 import kotlinx.coroutines.Dispatchers
@@ -58,6 +59,9 @@ class FeedViewModel(application: Application) : AndroidViewModel(application) {
     private var currentPage = 0
     private val pageSize = 20
     private val prefetchDistance = 5
+    private var loadCount = 0 // Track feed loads for smart query rotation
+    private var currentQuery = "fantasy" // Store current query for pagination
+    private var currentOrderBy: String? = null // Store current orderBy for pagination
 
     init {
         Log.d("FeedViewModel", "Initializing with API key: ${BuildKonfig.GOOGLE_BOOKS_API_KEY.take(8)}...")
@@ -99,8 +103,9 @@ class FeedViewModel(application: Application) : AndroidViewModel(application) {
     /**
      * Loads the first page of books on ViewModel creation.
      *
-     * Uses "fantasy" as default search query for MVP.
-     * Future phases will add user preferences and personalization.
+     * Uses smart feed strategy with rotation to provide fresh, relevant content
+     * while maintaining discovery and variety. Balances recent popular books,
+     * high-quality classics, and serendipitous discovery.
      */
     private fun loadInitialBooks() {
         Log.d("FeedViewModel", "Starting initial book load...")
@@ -108,11 +113,18 @@ class FeedViewModel(application: Application) : AndroidViewModel(application) {
             _isLoading.value = true
             _errorMessage.value = null
             try {
-                val result = repository.searchBooks("fantasy")
+                // Get smart query strategy for current load
+                val (query, orderBy) = FeedStrategy.getSmartQuery(loadCount)
+                currentQuery = query
+                currentOrderBy = orderBy
+                Log.d("FeedViewModel", "Using smart query: '$query' with orderBy: $orderBy")
+
+                val result = repository.searchBooks(query, orderBy = orderBy)
                 result.onSuccess { bookList ->
                     Log.d("FeedViewModel", "Successfully loaded ${bookList.size} books")
                     _books.value = bookList
                     currentPage = 1
+                    loadCount++ // Increment for next smart query rotation
                 }
                 result.onFailure { error ->
                     val errorMsg = "Failed to load books: ${error.message}"
@@ -141,8 +153,8 @@ class FeedViewModel(application: Application) : AndroidViewModel(application) {
     /**
      * Loads the next page of books and appends to current list.
      *
-     * Only loads if not currently loading to prevent race conditions.
-     * Uses startIndex parameter for proper pagination.
+     * Uses the same query and orderBy as the initial load to maintain consistency
+     * within a browsing session. Only loads if not currently loading to prevent race conditions.
      */
     fun loadMoreBooks() {
         if (_isLoading.value) return
@@ -150,10 +162,15 @@ class FeedViewModel(application: Application) : AndroidViewModel(application) {
         viewModelScope.launch {
             _isLoading.value = true
             try {
-                // For MVP, continue loading fantasy books
-                // Use startIndex for proper pagination
+                // Use same query and orderBy as initial load for consistency
                 val startIndex = _books.value.size
-                val result = repository.searchBooks("fantasy", startIndex = startIndex)
+                Log.d("FeedViewModel", "Loading more books with query: '$currentQuery', startIndex: $startIndex")
+
+                val result = repository.searchBooks(
+                    query = currentQuery,
+                    startIndex = startIndex,
+                    orderBy = currentOrderBy
+                )
                 result.onSuccess { bookList ->
                     if (bookList.isNotEmpty()) {
                         // Filter out any books that are already in our list (deduplicate by ID)

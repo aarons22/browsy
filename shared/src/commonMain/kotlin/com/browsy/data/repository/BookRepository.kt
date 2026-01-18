@@ -67,9 +67,14 @@ class BookRepository(
      *
      * @param query Search query (supports Google Books query syntax: intitle:, inauthor:, isbn:, etc.)
      * @param startIndex Index of first result to return (for pagination, default 0)
+     * @param orderBy Sort order: "newest" or "relevance" (default null uses API default)
      * @return Result with list of matching books, or empty list if none found
      */
-    suspend fun searchBooks(query: String, startIndex: Int = 0): Result<List<Book>> {
+    suspend fun searchBooks(
+        query: String,
+        startIndex: Int = 0,
+        orderBy: String? = null
+    ): Result<List<Book>> {
         // Check cache first (only for first page)
         if (startIndex == 0) {
             val cacheKey = "search:$query"
@@ -77,7 +82,11 @@ class BookRepository(
         }
 
         // Try Google Books first
-        val googleResult = googleBooksApi.searchBooks(query, startIndex = startIndex)
+        val googleResult = googleBooksApi.searchBooks(
+            query = query,
+            startIndex = startIndex,
+            orderBy = orderBy
+        )
         if (googleResult.isSuccess) {
             val books = googleResult.getOrNull()?.items?.map {
                 GoogleBooksMapper.run { it.toBook() }

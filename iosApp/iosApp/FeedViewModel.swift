@@ -10,6 +10,9 @@ class FeedViewModel: ObservableObject {
     private var currentPage = 0
     private let pageSize = 20
     private let prefetchThreshold = 5
+    private var loadCount: Int32 = 0
+    private var currentQuery = "fantasy"
+    private var currentOrderBy: String? = nil
 
     init() {
         repository = BookRepository.companion.create(googleBooksApiKey: BuildKonfig.shared.GOOGLE_BOOKS_API_KEY)
@@ -30,16 +33,28 @@ class FeedViewModel: ObservableObject {
         currentPage = 0
 
         do {
-            // Load first page with hardcoded "fantasy" query for MVP
+            // Use smart feed strategy for improved relevance
             guard let repo = repository else {
                 print("Repository not initialized")
                 isLoading = false
                 return
             }
 
-            let bookList = try await repo.searchBooksOrThrow(query: "fantasy")
+            // Get smart query strategy for current load
+            let smartQuery = FeedStrategy.shared.getSmartQuery(loadCount: loadCount)
+            currentQuery = smartQuery.first!
+            currentOrderBy = smartQuery.second
+
+            print("Using smart query: '\(currentQuery)' with orderBy: \(currentOrderBy ?? "nil")")
+
+            let bookList = try await repo.searchBooksOrThrow(
+                query: currentQuery,
+                startIndex: 0,
+                orderBy: currentOrderBy
+            )
             if let kotlinBooks = bookList as? [Book] {
                 books = kotlinBooks
+                loadCount += 1 // Increment for next smart query rotation
                 print("loaded \(books.count) books!")
             } else {
                 print("Failed to cast book list to [Book]")
@@ -57,9 +72,7 @@ class FeedViewModel: ObservableObject {
         isLoading = true
 
         do {
-            // Load next page of books using startIndex for pagination
-            // For MVP, we continue with "fantasy" query
-            // In Phase 8 (Feed Personalization), this will use user preferences
+            // Use same query and orderBy as initial load for consistency
             guard let repo = repository else {
                 print("Repository not initialized")
                 isLoading = false
@@ -67,7 +80,13 @@ class FeedViewModel: ObservableObject {
             }
 
             let startIndex = Int32(books.count)
-            let bookList = try await repo.searchBooksOrThrow(query: "fantasy", startIndex: startIndex)
+            print("Loading more books with query: '\(currentQuery)', startIndex: \(startIndex)")
+
+            let bookList = try await repo.searchBooksOrThrow(
+                query: currentQuery,
+                startIndex: startIndex,
+                orderBy: currentOrderBy
+            )
             if let kotlinBooks = bookList as? [Book] {
                 // Filter out any books that are already in our list (deduplicate by ID)
                 let existingIds = Set(books.map { $0.id })
