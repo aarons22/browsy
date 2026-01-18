@@ -118,6 +118,17 @@ class BookRepository(
     }
 
     /**
+     * Swift-compatible overload for searchBooks with orderBy parameter.
+     * @param query Search query
+     * @param startIndex Start index for pagination
+     * @param orderBy Sort order ("newest" or "relevance")
+     * @return Result with list of matching books
+     */
+    suspend fun searchBooks(query: String, startIndex: Int, orderBy: String): Result<List<Book>> {
+        return searchBooks(query, startIndex, orderBy as String?)
+    }
+
+    /**
      * Fetches book details by ISBN with automatic API fallback.
      *
      * ISBN lookup strategy:

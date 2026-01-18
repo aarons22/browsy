@@ -3,44 +3,36 @@ package com.browsy.data.feed
 import kotlin.random.Random
 
 /**
- * Date-focused feed strategy for maximum book discoverability.
+ * Reliable feed strategy focused on genre variety and quality results.
  *
- * Uses Google Books API "newer:" operator to get recent releases across diverse genres
- * without limiting to specific authors. This approach maximizes serendipitous discovery
- * - the core value of Browsy's "bookstore browsing" experience.
+ * After testing, Google Books API date operators ("newer:") and orderBy=newest
+ * are unreliable - they often return old books or library catalogs. This approach
+ * uses simple genre terms with relevance ordering to get quality, varied books
+ * that users actually want to read.
  *
- * Strategy: Focus on recent books (last 1-2 years) across varied genres, letting users
- * discover new authors and unexpected gems rather than limiting to known names.
+ * Strategy: Simple genre rotation with relevance-based ordering for consistent,
+ * quality results that support discoverable browsing.
  */
 object FeedStrategy {
 
     /**
-     * Generates queries focused on recent releases for maximum discoverability.
+     * Generates reliable queries focused on genre variety and quality.
      *
-     * Uses "newer:YYYY" operator with diverse genres to surface fresh content from
-     * unknown authors alongside established ones. Avoids author-specific queries
-     * that limit discovery potential.
+     * Uses simple genre terms with orderBy=relevance, which is more reliable than
+     * orderBy=newest for returning actual readable books instead of catalog metadata.
      *
      * @param loadCount Number of times feed has been loaded (for rotation)
-     * @return Pair of (query, orderBy) optimized for recent, diverse discovery
+     * @return Pair of (query, orderBy) optimized for reliable, quality results
      */
     fun getSmartQuery(loadCount: Int = 0): Pair<String, String?> {
-        return when (loadCount % 8) {
-            // Recent fiction across genres (2023+ for good variety)
-            0 -> Pair("fiction newer:2025", "newest")
-            1 -> Pair("fantasy newer:2025", "newest")
-            2 -> Pair("mystery newer:2025", "newest")
-            3 -> Pair("romance newer:2025", "newest")
+        return when (loadCount % 4) {
+            // Simple, proven queries that work reliably
+            0 -> Pair("fantasy", null)  // Original working query
+            1 -> Pair("fiction", null)
+            2 -> Pair("mystery", null)
+            3 -> Pair("romance", null)
 
-            // Very recent releases (2024+ for cutting edge)
-            4 -> Pair("novel newer:2024", "newest")
-            5 -> Pair("bestseller newer:2024", "newest")
-
-            // Mix relevance for established recent books
-            6 -> Pair("fiction newer:2025", "relevance")
-            7 -> Pair("bestseller newer:2025", "relevance")
-
-            else -> Pair("fiction newer:2025", "newest") // fallback
+            else -> Pair("fantasy", null) // fallback to original
         }
     }
 }

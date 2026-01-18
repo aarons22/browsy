@@ -45,8 +45,12 @@ class FeedViewModel: ObservableObject {
             currentQuery = String(smartQuery.first!)
             currentOrderBy = smartQuery.second != nil ? String(smartQuery.second!) : nil
 
-            print("Using smart query: '\(currentQuery)' with orderBy: \(currentOrderBy ?? "nil")")
+            print("iOS DEBUG - Load count: \(loadCount)")
+            print("iOS DEBUG - Smart query first: \(smartQuery.first!)")
+            print("iOS DEBUG - Smart query second: \(smartQuery.second ?? "nil")")
+            print("iOS DEBUG - Using smart query: '\(currentQuery)' with orderBy: \(currentOrderBy ?? "nil")")
 
+            // Use simple version without orderBy (iOS doesn't support orderBy yet)
             let bookList = try await repo.searchBooksOrThrow(
                 query: currentQuery,
                 startIndex: 0
@@ -80,7 +84,9 @@ class FeedViewModel: ObservableObject {
 
             let startIndex = Int32(books.count)
             print("Loading more books with query: '\(currentQuery)', startIndex: \(startIndex)")
+            print("iOS DEBUG - More books orderBy: \(currentOrderBy ?? "nil")")
 
+            // Use simple version without orderBy (iOS doesn't support orderBy yet)
             let bookList = try await repo.searchBooksOrThrow(
                 query: currentQuery,
                 startIndex: startIndex
