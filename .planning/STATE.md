@@ -5,7 +5,7 @@
 See: .planning/PROJECT.md (updated 2026-01-14)
 
 **Core value:** The swipe experience must feel like browsing shelves in a bookstore — full-screen covers, smooth transitions, one book at a time, never rushed.
-**Current focus:** Phase 4 — Book Info & Actions
+**Current focus:** Phase 5 — Backend Infrastructure
 
 ## Current Position
 
