@@ -6,6 +6,9 @@ import { initializeApp, applicationDefault } from 'firebase-admin/app';
 import { getFirestore } from 'firebase-admin/firestore';
 import dotenv from 'dotenv';
 
+// Routes
+import shelvesRoutes from './routes/shelves';
+
 // Load environment variables
 dotenv.config();
 
@@ -50,10 +53,14 @@ app.get('/', (_req, res) => {
     message: 'Browsy Backend API',
     version: '1.0.0',
     endpoints: {
-      health: '/health'
+      health: '/health',
+      shelves: '/api/shelves'
     }
   });
 });
+
+// API Routes
+app.use('/api/shelves', shelvesRoutes);
 
 // Start server
 app.listen(PORT, () => {
