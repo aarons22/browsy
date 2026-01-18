@@ -4,6 +4,7 @@ import shared
 struct BookFeedView: View {
     @StateObject private var viewModel = FeedViewModel()
     @State private var selectedBook: Book? = nil
+    @State private var shelfRefreshId = UUID()
 
     var body: some View {
         ZStack {
@@ -14,7 +15,7 @@ struct BookFeedView: View {
                 ScrollView(.vertical, showsIndicators: false) {
                     LazyVStack(spacing: 0) {
                         ForEach(Array(viewModel.books.enumerated()), id: \.element.id) { index, book in
-                            BookCoverCard(book: book, index: index, viewModel: viewModel)
+                            BookCoverCard(book: book, index: index, viewModel: viewModel, shelfRefreshId: shelfRefreshId)
                                 .containerRelativeFrame(.vertical)
                                 .onAppear {
                                     viewModel.onBookAppear(index: index)
@@ -33,7 +34,10 @@ struct BookFeedView: View {
         .task {
             await viewModel.loadInitialBooks()
         }
-        .sheet(item: $selectedBook) { book in
+        .sheet(item: $selectedBook, onDismiss: {
+            // Trigger shelf state refresh when sheet dismisses
+            shelfRefreshId = UUID()
+        }) { book in
             BookInfoSheet(book: book)
                 .presentationDetents([.medium, .large])
                 .presentationDragIndicator(.visible)
@@ -45,6 +49,7 @@ struct BookCoverCard: View {
     let book: Book
     let index: Int
     let viewModel: FeedViewModel
+    let shelfRefreshId: UUID
     @StateObject private var shelfViewModel = ShelfViewModel()
 
     var body: some View {
@@ -105,6 +110,9 @@ struct BookCoverCard: View {
         }
         .ignoresSafeArea()
         .onAppear {
+            shelfViewModel.loadState(for: book.id)
+        }
+        .onChange(of: shelfRefreshId) { oldValue, newValue in
             shelfViewModel.loadState(for: book.id)
         }
     }
