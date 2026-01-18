@@ -10,18 +10,18 @@ See: .planning/PROJECT.md (updated 2026-01-14)
 ## Current Position
 
 Phase: 4 of 8 (Book Info & Actions) - IN PROGRESS
-Plan: 04 complete (3/3 tasks) - Gap Closure
-Status: 2 of 4 plans complete in Phase 04
-Last activity: 2026-01-18 — Completed 04-04-PLAN.md (UAT gap closure)
+Plan: 02 complete (1/1 tasks) - iOS Book Info Panel TBR State Sync Fix
+Status: 3 of 4 plans complete in Phase 04
+Last activity: 2026-01-18 — Completed 04-02 TBR state sync fix
 
-Progress: ███████░░░ 69%
+Progress: ████████░░ 75%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 11
+- Total plans completed: 12
 - Average duration: 9 min
-- Total execution time: 107 min
+- Total execution time: 115 min
 
 **By Phase:**
 
@@ -30,11 +30,11 @@ Progress: ███████░░░ 69%
 | 01-foundation | 3/3 | 35 min | 12 min |
 | 02-book-data-layer | 4/4 | 22 min | 6 min |
 | 03-core-ui-main-feed | 3/3 | 35 min | 12 min |
-| 04-book-info-actions | 2/4 | 15 min | 8 min |
+| 04-book-info-actions | 3/4 | 23 min | 8 min |
 
 **Recent Trend:**
-- Last 5 plans: 03-01 (5 min), 03-02 (20 min), 03-FIX (10 min), 04-01 (12 min), 04-04 (3 min)
-- Trend: Bug fix plans completing rapidly
+- Last 5 plans: 03-02 (20 min), 03-FIX (10 min), 04-01 (12 min), 04-04 (3 min), 04-02 (8 min)
+- Trend: Bug fix plans completing rapidly, consistent performance
 
 ## Accumulated Context
 
@@ -88,6 +88,9 @@ Recent decisions affecting current work:
 | 04-04 | .sheet(item:) for iOS sheets | Avoids race condition by atomically binding presentation to optional data |
 | 04-04 | UUID refresh trigger | Pattern for cross-component state sync without shared ViewModels |
 | 04-04 | Android when block for states | Mutually exclusive loading/error/content branches prevent UI gaps |
+| 04-02 | Shared ShelfViewModel instance | Pass single instance to ensure state consistency across feed and modal |
+| 04-02 | UUID refresh from ViewModel | ViewModel-driven refresh trigger instead of manual onDismiss |
+| 04-02 | Per-book state queries | Individual cards query own TBR state to avoid shared state conflicts |
 
 ### Deferred Issues
 
@@ -103,7 +106,7 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-01-18T00:12:27Z
-Stopped at: Completed Plan 04-04 (Gap Closure)
+Last session: 2026-01-18T09:52:00Z
+Stopped at: Completed Plan 04-02 (iOS TBR State Sync Fix)
 Resume file: None
-Next: TBD - Phase 04 has 2 more plans to review
+Next: TBD - Phase 04 has 1 more plan to review

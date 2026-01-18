@@ -3,7 +3,7 @@ import shared
 
 struct BookInfoSheet: View {
     let book: Book
-    @ObservedObject let shelfViewModel: ShelfViewModel
+    @ObservedObject var shelfViewModel: ShelfViewModel
     @Environment(\.dismiss) private var dismiss
 
     var body: some View {

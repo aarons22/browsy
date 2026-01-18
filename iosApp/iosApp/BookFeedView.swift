@@ -48,7 +48,7 @@ struct BookCoverCard: View {
     let book: Book
     let index: Int
     let viewModel: FeedViewModel
-    @ObservedObject let shelfViewModel: ShelfViewModel
+    @ObservedObject var shelfViewModel: ShelfViewModel
     @State private var isOnTBR: Bool = false
 
     var body: some View {
