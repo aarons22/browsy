@@ -13,7 +13,7 @@ import com.browsy.data.remote.dto.VolumeItem
  *
  * Mapping strategies:
  * - Authors: Uses first author from list, falls back to "Unknown Author"
- * - Cover images: Prefers larger sizes (large → medium → thumbnail)
+ * - Cover images: Prefers larger sizes (extraLarge → large → medium → thumbnail)
  * - ISBN: Prefers ISBN-13 over ISBN-10
  * - Subjects: Maps categories directly to subjects list
  */
@@ -42,7 +42,8 @@ object GoogleBooksMapper {
             id = id,
             title = info.title,
             author = info.authors?.firstOrNull() ?: "Unknown Author",
-            coverUrl = (info.imageLinks?.large
+            coverUrl = (info.imageLinks?.extraLarge
+                ?: info.imageLinks?.large
                 ?: info.imageLinks?.medium
                 ?: info.imageLinks?.thumbnail)?.toHttps(),
             description = info.description,
