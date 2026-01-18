@@ -3,6 +3,7 @@ package com.browsy.data.remote
 import com.browsy.data.remote.dto.GoogleBooksResponse
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
+import io.ktor.client.plugins.HttpTimeout
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
 import io.ktor.client.request.get
 import io.ktor.client.request.parameter
@@ -38,6 +39,12 @@ class GoogleBooksApi(private val apiKey: String) {
                 isLenient = true
             })
         }
+
+        install(HttpTimeout) {
+            requestTimeoutMillis = 30000
+            connectTimeoutMillis = 10000
+            socketTimeoutMillis = 30000
+        }
     }
 
     private val baseUrl = "https://www.googleapis.com/books/v1/volumes"
@@ -63,21 +70,26 @@ class GoogleBooksApi(private val apiKey: String) {
         startIndex: Int = 0
     ): Result<GoogleBooksResponse> {
         return try {
+            println("GoogleBooksApi: Searching for '$query' (maxResults=$maxResults, startIndex=$startIndex)")
             val httpResponse = client.get(baseUrl) {
                 parameter("q", query)
                 parameter("maxResults", maxResults)
                 parameter("startIndex", startIndex)
-                parameter("key", apiKey)
+                parameter("key", apiKey.take(8) + "...")
             }
 
             if (httpResponse.status.value !in 200..299) {
                 val errorBody = httpResponse.body<String>()
-                return Result.failure(Exception("Google Books API error ${httpResponse.status.value}: $errorBody"))
+                val message = "Google Books API error ${httpResponse.status.value}: $errorBody"
+                println("GoogleBooksApi: $message")
+                return Result.failure(Exception(message))
             }
 
             val response = httpResponse.body<GoogleBooksResponse>()
+            println("GoogleBooksApi: Successfully loaded ${response.totalItems} total items, ${response.items?.size ?: 0} items returned")
             Result.success(response)
         } catch (e: Exception) {
+            println("GoogleBooksApi: Exception during search - ${e.message}")
             Result.failure(e)
         }
     }

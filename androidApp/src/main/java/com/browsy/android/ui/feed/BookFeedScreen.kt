@@ -125,7 +125,7 @@ fun BookFeedScreen(
                         )
                         Spacer(modifier = Modifier.height(8.dp))
                         Text(
-                            text = "Check your internet connection",
+                            text = "Check your internet connection and API key",
                             style = MaterialTheme.typography.bodyMedium,
                             color = MaterialTheme.colorScheme.onSurfaceVariant
                         )

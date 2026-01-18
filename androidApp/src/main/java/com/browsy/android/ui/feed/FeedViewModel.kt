@@ -1,5 +1,6 @@
 package com.browsy.android.ui.feed
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.browsy.config.BuildKonfig
@@ -45,6 +46,7 @@ class FeedViewModel : ViewModel() {
     private val prefetchDistance = 5
 
     init {
+        Log.d("FeedViewModel", "Initializing with API key: ${BuildKonfig.GOOGLE_BOOKS_API_KEY.take(8)}...")
         loadInitialBooks()
     }
 
@@ -55,22 +57,24 @@ class FeedViewModel : ViewModel() {
      * Future phases will add user preferences and personalization.
      */
     private fun loadInitialBooks() {
+        Log.d("FeedViewModel", "Starting initial book load...")
         viewModelScope.launch {
             _isLoading.value = true
             try {
                 val result = repository.searchBooks("fantasy")
                 result.onSuccess { bookList ->
+                    Log.d("FeedViewModel", "Successfully loaded ${bookList.size} books")
                     _books.value = bookList
                     currentPage = 1
                 }
                 result.onFailure { error ->
-                    // Log error - proper error UI in Phase 4
-                    println("Error loading initial books: ${error.message}")
+                    Log.e("FeedViewModel", "Error loading initial books: ${error.message}", error)
                 }
             } catch (e: Exception) {
-                println("Exception loading initial books: ${e.message}")
+                Log.e("FeedViewModel", "Exception loading initial books: ${e.message}", e)
             } finally {
                 _isLoading.value = false
+                Log.d("FeedViewModel", "Initial load completed. Books count: ${_books.value.size}")
             }
         }
     }
