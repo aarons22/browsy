@@ -10,11 +10,14 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.pager.VerticalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.FavoriteBorder
+import androidx.compose.material.icons.filled.Warning
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -77,46 +80,90 @@ fun BookFeedScreen(
         }
     }
 
-    if (books.isEmpty() && !isLoading) {
-        // Empty state - show loading or placeholder
-        Box(
-            modifier = Modifier.fillMaxSize(),
-            contentAlignment = Alignment.Center
-        ) {
-            Text(
-                text = "Loading books...",
-                style = MaterialTheme.typography.bodyLarge,
-                color = MaterialTheme.colorScheme.onBackground
-            )
-        }
-    } else if (books.isNotEmpty()) {
-        VerticalPager(
-            state = pagerState,
-            pageSpacing = 0.dp,
-            key = { books[it].id },
-            modifier = Modifier.fillMaxSize(),
-            pageContent = { page ->
-                BookCoverPage(
-                    book = books[page],
-                    onBookClick = {
-                        selectedBook = books[page]
-                        showInfoSheet = true
-                    },
-                    modifier = Modifier.fillMaxSize()
+    Box(modifier = Modifier.fillMaxSize()) {
+        when {
+            // Initial loading state - show spinner
+            isLoading && books.isEmpty() -> {
+                Box(
+                    modifier = Modifier.fillMaxSize(),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Column(
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
+                        CircularProgressIndicator()
+                        Spacer(modifier = Modifier.height(16.dp))
+                        Text(
+                            text = "Loading books...",
+                            style = MaterialTheme.typography.bodyLarge,
+                            color = MaterialTheme.colorScheme.onBackground
+                        )
+                    }
+                }
+            }
+
+            // Empty state after loading - show error/retry
+            !isLoading && books.isEmpty() -> {
+                Box(
+                    modifier = Modifier.fillMaxSize(),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Column(
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.Warning,
+                            contentDescription = "Error",
+                            modifier = Modifier.size(48.dp),
+                            tint = MaterialTheme.colorScheme.error
+                        )
+                        Spacer(modifier = Modifier.height(16.dp))
+                        Text(
+                            text = "Unable to load books",
+                            style = MaterialTheme.typography.bodyLarge,
+                            color = MaterialTheme.colorScheme.onBackground
+                        )
+                        Spacer(modifier = Modifier.height(8.dp))
+                        Text(
+                            text = "Check your internet connection",
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                    }
+                }
+            }
+
+            // Normal state - show pager
+            books.isNotEmpty() -> {
+                VerticalPager(
+                    state = pagerState,
+                    pageSpacing = 0.dp,
+                    key = { books[it].id },
+                    modifier = Modifier.fillMaxSize(),
+                    pageContent = { page ->
+                        BookCoverPage(
+                            book = books[page],
+                            onBookClick = {
+                                selectedBook = books[page]
+                                showInfoSheet = true
+                            },
+                            modifier = Modifier.fillMaxSize()
+                        )
+                    }
                 )
             }
-        )
-    }
+        }
 
-    // Book info bottom sheet
-    if (showInfoSheet && selectedBook != null) {
-        BookInfoBottomSheet(
-            book = selectedBook!!,
-            onDismiss = {
-                showInfoSheet = false
-                selectedBook = null
-            }
-        )
+        // Book info bottom sheet (outside the when block, always available)
+        if (showInfoSheet && selectedBook != null) {
+            BookInfoBottomSheet(
+                book = selectedBook!!,
+                onDismiss = {
+                    showInfoSheet = false
+                    selectedBook = null
+                }
+            )
+        }
     }
 }
 
