@@ -10,10 +10,12 @@ import androidx.lifecycle.viewModelScope
 import com.browsy.config.BuildKonfig
 import com.browsy.data.model.Book
 import com.browsy.data.repository.BookRepository
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import java.net.InetAddress
 import java.net.UnknownHostException
 
@@ -59,15 +61,19 @@ class FeedViewModel(application: Application) : AndroidViewModel(application) {
 
     init {
         Log.d("FeedViewModel", "Initializing with API key: ${BuildKonfig.GOOGLE_BOOKS_API_KEY.take(8)}...")
-        checkNetworkConnectivity()
         loadInitialBooks()
+        // Delay network connectivity check to avoid NetworkOnMainThreadException in constructor
+        viewModelScope.launch {
+            checkNetworkConnectivity()
+        }
     }
 
     /**
      * Checks network connectivity and DNS resolution.
      * Provides detailed diagnostics for troubleshooting network issues.
+     * Must be called from a coroutine context to avoid NetworkOnMainThreadException.
      */
-    private fun checkNetworkConnectivity() {
+    private suspend fun checkNetworkConnectivity() {
         val connectivityManager = getApplication<Application>().getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
         val network = connectivityManager.activeNetwork
         val capabilities = connectivityManager.getNetworkCapabilities(network)
@@ -78,8 +84,8 @@ class FeedViewModel(application: Application) : AndroidViewModel(application) {
         Log.d("FeedViewModel", "  - Validated: ${capabilities?.hasCapability(NetworkCapabilities.NET_CAPABILITY_VALIDATED) == true}")
         Log.d("FeedViewModel", "  - Not metered: ${capabilities?.hasCapability(NetworkCapabilities.NET_CAPABILITY_NOT_METERED) == true}")
 
-        // Test DNS resolution for googleapis.com
-        viewModelScope.launch {
+        // Test DNS resolution for googleapis.com on IO thread to avoid NetworkOnMainThreadException
+        withContext(Dispatchers.IO) {
             try {
                 val address = InetAddress.getByName("www.googleapis.com")
                 Log.d("FeedViewModel", "DNS resolution successful for www.googleapis.com: ${address.hostAddress}")
@@ -197,7 +203,9 @@ class FeedViewModel(application: Application) : AndroidViewModel(application) {
     fun retry() {
         Log.d("FeedViewModel", "Retrying book load...")
         _errorMessage.value = null
-        checkNetworkConnectivity()
+        viewModelScope.launch {
+            checkNetworkConnectivity()
+        }
         if (_books.value.isEmpty()) {
             loadInitialBooks()
         } else {
