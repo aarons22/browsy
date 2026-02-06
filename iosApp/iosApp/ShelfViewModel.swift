@@ -1,5 +1,4 @@
 import SwiftUI
-import shared
 
 @MainActor
 class ShelfViewModel: ObservableObject {

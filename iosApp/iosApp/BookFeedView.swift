@@ -1,5 +1,4 @@
 import SwiftUI
-import shared
 
 struct BookFeedView: View {
     @StateObject private var viewModel = FeedViewModel()
@@ -159,9 +158,6 @@ struct BookCoverCard: View {
             )
     }
 }
-
-// MARK: - Identifiable Conformance
-extension Book: Identifiable {}
 
 #Preview {
     BookFeedView()

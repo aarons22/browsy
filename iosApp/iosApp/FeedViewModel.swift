@@ -1,5 +1,4 @@
 import Foundation
-import shared
 
 @MainActor
 class FeedViewModel: ObservableObject {
@@ -10,12 +9,12 @@ class FeedViewModel: ObservableObject {
     private var currentPage = 0
     private let pageSize = 20
     private let prefetchThreshold = 5
-    private var loadCount: Int32 = 0
+    private var loadCount: Int = 0
     private var currentQuery = "fantasy"
     private var currentOrderBy: String? = nil
 
     init() {
-        repository = BookRepository.companion.create(googleBooksApiKey: BuildKonfig.shared.GOOGLE_BOOKS_API_KEY)
+        repository = BookRepository.create(googleBooksApiKey: BuildConfig.shared.googleBooksApiKey)
     }
 
     deinit {
@@ -33,7 +32,6 @@ class FeedViewModel: ObservableObject {
         currentPage = 0
 
         do {
-            // Use smart feed strategy for improved relevance
             guard let repo = repository else {
                 print("Repository not initialized")
                 isLoading = false
@@ -41,29 +39,27 @@ class FeedViewModel: ObservableObject {
             }
 
             // Get smart query strategy for current load
-            let smartQuery = FeedStrategy.shared.getSmartQuery(loadCount: loadCount)
-            currentQuery = String(smartQuery.first!)
-            currentOrderBy = smartQuery.second != nil ? String(smartQuery.second!) : nil
+            let smartQuery = FeedStrategy.getSmartQuery(loadCount: loadCount)
+            currentQuery = smartQuery.0
+            currentOrderBy = smartQuery.1
 
             print("iOS DEBUG - Load count: \(loadCount)")
-            print("iOS DEBUG - Smart query first: \(smartQuery.first!)")
-            print("iOS DEBUG - Smart query second: \(smartQuery.second ?? "nil")")
             print("iOS DEBUG - Using smart query: '\(currentQuery)' with orderBy: \(currentOrderBy ?? "nil")")
 
             // Use simple version without orderBy (iOS doesn't support orderBy yet)
-            let bookList = try await repo.searchBooksOrThrow(
+            let result = await repo.searchBooks(
                 query: currentQuery,
                 startIndex: 0
             )
-            if let kotlinBooks = bookList as? [Book] {
-                books = kotlinBooks
+            
+            switch result {
+            case .success(let bookList):
+                books = bookList
                 loadCount += 1 // Increment for next smart query rotation
                 print("loaded \(books.count) books!")
-            } else {
-                print("Failed to cast book list to [Book]")
+            case .failure(let error):
+                print("Error loading initial books: \(error)")
             }
-        } catch {
-            print("Error loading initial books: \(error)")
         }
 
         isLoading = false
@@ -75,31 +71,32 @@ class FeedViewModel: ObservableObject {
         isLoading = true
 
         do {
-            // Use same query and orderBy as initial load for consistency
             guard let repo = repository else {
                 print("Repository not initialized")
                 isLoading = false
                 return
             }
 
-            let startIndex = Int32(books.count)
+            let startIndex = books.count
             print("Loading more books with query: '\(currentQuery)', startIndex: \(startIndex)")
             print("iOS DEBUG - More books orderBy: \(currentOrderBy ?? "nil")")
 
-            // Use simple version without orderBy (iOS doesn't support orderBy yet)
-            let bookList = try await repo.searchBooksOrThrow(
+            // Use simple version without orderBy
+            let result = await repo.searchBooks(
                 query: currentQuery,
                 startIndex: startIndex
             )
-            if let kotlinBooks = bookList as? [Book] {
+            
+            switch result {
+            case .success(let bookList):
                 // Filter out any books that are already in our list (deduplicate by ID)
                 let existingIds = Set(books.map { $0.id })
-                let newBooks = kotlinBooks.filter { !existingIds.contains($0.id) }
+                let newBooks = bookList.filter { !existingIds.contains($0.id) }
                 books.append(contentsOf: newBooks)
                 currentPage += 1
+            case .failure(let error):
+                print("Error loading more books: \(error)")
             }
-        } catch {
-            print("Error loading more books: \(error)")
         }
 
         isLoading = false
