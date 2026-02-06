@@ -1,4 +1,7 @@
 import Foundation
+#if canImport(FoundationNetworking)
+import FoundationNetworking
+#endif
 
 /// API client for Open Library Books API (https://openlibrary.org/dev/docs/api/books)
 ///
