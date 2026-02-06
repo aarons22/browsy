@@ -1,0 +1,4 @@
+# iOS Configuration Files
+Config/
+*.xcconfig
+!*.xcconfig.template
