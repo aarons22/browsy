@@ -2,52 +2,59 @@
 
 ## Overview
 
-Kotlin Multiplatform Mobile (KMP) project with shared business logic and native UI layers for Android and iOS.
+Native iOS and Android applications with separate implementations of business logic on each platform.
+
+## Architecture
+
+Browsy uses a **native-first architecture** where iOS and Android apps maintain their own implementations of business logic:
+- **iOS**: Pure Swift implementation
+- **Android**: Pure Kotlin implementation
+- **No shared code**: Each platform optimized independently
 
 ## Modules
 
-### Root Project: Browsy
-The root project coordinates builds across all subprojects.
-
-### :shared
-**Purpose:** Shared Kotlin Multiplatform module containing cross-platform business logic
-
-**Targets:**
-- `android` - Android library
-- `iosArm64` - iOS devices (ARM64)
-- `iosSimulatorArm64` - iOS simulator on Apple Silicon
-- `iosX64` - iOS simulator on Intel Macs
-
-**Build output:**
-- Android: AAR library consumed by androidApp
-- iOS: Static framework consumed by iosApp
-
-**Source sets:**
-- `commonMain/` - Platform-agnostic Kotlin code
-- `androidMain/` - Android-specific implementations
-- `iosMain/` - iOS-specific implementations (shared across all iOS targets)
-
 ### :androidApp
-**Purpose:** Android application module with Jetpack Compose UI
+**Purpose:** Android application with native Kotlin business logic and Jetpack Compose UI
 
 **Type:** Android Application
+**Language:** Kotlin
 **UI Framework:** Jetpack Compose with Material 3
-**Dependencies:** Consumes :shared module as an AAR library
+
+**Structure:**
+```
+androidApp/src/main/java/com/browsy/
+├── android/              - Android app components
+│   ├── MainActivity.kt
+│   ├── BrowsyApplication.kt
+│   └── ui/               - Compose UI screens and ViewModels
+├── config/               - Build configuration
+└── data/                 - Business logic (models, repositories, APIs)
+```
 
 **Build output:**
 - Debug APK: `androidApp/build/outputs/apk/debug/androidApp-debug.apk`
 - Release APK: `androidApp/build/outputs/apk/release/androidApp-release.apk`
 
-### :iosApp
-**Purpose:** iOS application with SwiftUI UI
+### iOS App
+**Purpose:** iOS application with native Swift business logic and SwiftUI UI
 
-**Type:** Xcode project
+**Type:** Native iOS Application
+**Language:** Swift
 **UI Framework:** SwiftUI
-**Dependencies:** Consumes :shared module as a static framework via Gradle integration
+**Minimum iOS Version:** 26.0
 
-**Build integration:**
-- Xcode build phase runs `embedAndSignAppleFrameworkForXcode` Gradle task
-- Framework search paths point to `shared/build/xcode-frameworks/`
+**Structure:**
+```
+iosApp/iosApp/
+├── Models/               - Data models
+├── Data/                 - Business logic
+│   ├── Remote/          - API clients
+│   ├── Repository/      - Data repositories
+│   ├── Cache/           - Caching layer
+│   └── Mappers/         - DTO mappers
+├── Views/               - SwiftUI views
+└── ViewModels/          - View state management
+```
 
 ## Version Information
 
@@ -56,28 +63,14 @@ The root project coordinates builds across all subprojects.
 | Kotlin | 2.0.0 |
 | Gradle | 8.5 |
 | Android Gradle Plugin | 8.2.2 |
-| Compose BOM | 2024.01.00 |
-| iOS Deployment Target | 16.0 |
+| Compose BOM | 2024.06.00 |
+| iOS Deployment Target | 26.0 |
 | Min Android SDK | 24 |
 | Target Android SDK | 34 |
+| Swift | 6.0 |
+| Xcode | 15+ |
 
 ## Common Gradle Tasks
-
-### Full Project
-
-```bash
-# Build everything (Android + shared module)
-./gradlew build
-
-# Clean all build outputs
-./gradlew clean
-
-# List all modules
-./gradlew projects
-
-# List all tasks
-./gradlew tasks
-```
 
 ### Android App
 
@@ -96,65 +89,45 @@ The root project coordinates builds across all subprojects.
 
 # Run Android lint checks
 ./gradlew :androidApp:lint
-```
 
-### Shared Module
-
-```bash
-# Build shared module for all targets
-./gradlew :shared:assemble
-
-# Build iOS framework for specific target
-./gradlew :shared:linkDebugFrameworkIosArm64         # Device
-./gradlew :shared:linkDebugFrameworkIosSimulatorArm64 # Apple Silicon simulator
-./gradlew :shared:linkDebugFrameworkIosX64            # Intel simulator
-
-# Run shared module tests
-./gradlew :shared:test
+# Clean build
+./gradlew clean
 ```
 
 ### iOS App
 
 ```bash
-# Build iOS framework from command line (requires macOS)
-./gradlew :shared:embedAndSignAppleFrameworkForXcode
-
 # Open in Xcode (macOS only)
 open iosApp/iosApp.xcodeproj
-```
 
-**Note:** iOS app builds require macOS. The Gradle tasks for iOS framework compilation (linkDebugFrameworkIos*) will be skipped on non-macOS platforms.
+# Build from command line (macOS only)
+xcodebuild -project iosApp/iosApp.xcodeproj -scheme iosApp -configuration Debug
+
+# Run tests
+xcodebuild test -project iosApp/iosApp.xcodeproj -scheme iosApp
+```
 
 ## Project Architecture
 
 ```
 browsy/
-├── androidApp/          # Android app with Compose UI
+├── androidApp/          # Android app with native Kotlin
 │   ├── src/
 │   │   └── main/
 │   │       ├── AndroidManifest.xml
-│   │       └── java/com/browsy/android/
-│   │           ├── MainActivity.kt
-│   │           └── ui/theme/
+│   │       └── java/com/browsy/
+│   │           ├── android/      # UI layer
+│   │           ├── config/       # Configuration
+│   │           └── data/         # Business logic
 │   └── build.gradle.kts
 │
-├── iosApp/              # iOS app with SwiftUI
+├── iosApp/              # iOS app with native Swift
 │   ├── iosApp.xcodeproj/
 │   └── iosApp/
-│       ├── iOSApp.swift      # App entry point
-│       ├── ContentView.swift  # Main view
-│       └── Assets.xcassets/
-│
-├── shared/              # KMP shared module
-│   ├── src/
-│   │   ├── commonMain/kotlin/com/browsy/
-│   │   │   ├── Platform.kt    # expect declarations
-│   │   │   └── Greeting.kt    # Shared business logic
-│   │   ├── androidMain/kotlin/com/browsy/
-│   │   │   └── Platform.android.kt  # Android actuals
-│   │   └── iosMain/kotlin/com/browsy/
-│   │       └── Platform.ios.kt      # iOS actuals
-│   └── build.gradle.kts
+│       ├── iOSApp.swift
+│       ├── Models/
+│       ├── Data/
+│       └── Views/
 │
 ├── gradle/
 │   └── libs.versions.toml   # Version catalog
@@ -166,39 +139,33 @@ browsy/
 ## Key Configuration Files
 
 ### `gradle/libs.versions.toml`
-Centralized dependency version management. All library versions are defined here and referenced in module build files.
+Centralized dependency version management for Android.
 
 ### `gradle.properties`
 Build configuration and performance tuning:
 - JVM memory settings
 - Gradle build caching
-- Kotlin Native target settings
 
 ### `local.properties`
 Local environment configuration (not committed to git):
 - `sdk.dir` - Android SDK location
+- `google.books.api.key` - Google Books API key
 
 ## Development Notes
 
-### Platform-Specific Code
-The expect/actual pattern allows platform-specific implementations:
+### iOS Development
+- Requires macOS with Xcode 15+
+- Uses Swift 6.0 language features
+- SwiftUI for declarative UI
+- URLSession for networking
+- UserDefaults for local storage
 
-```kotlin
-// commonMain - declare interface
-expect fun getPlatform(): Platform
-
-// androidMain - Android implementation
-actual fun getPlatform(): Platform = AndroidPlatform()
-
-// iosMain - iOS implementation
-actual fun getPlatform(): Platform = IOSPlatform()
-```
-
-### iOS Framework Integration
-The iOS app consumes the shared Kotlin code as a static framework. Xcode automatically builds the framework via a build phase script that calls the Gradle task.
-
-### Android Library Integration
-The Android app consumes the shared module as a standard Android library (AAR) through Gradle dependency.
+### Android Development  
+- Uses Kotlin coroutines for async operations
+- Jetpack Compose for declarative UI
+- Ktor for networking
+- SharedPreferences for local storage
+- Material 3 design system
 
 ## Build System Requirements
 
@@ -208,19 +175,31 @@ The Android app consumes the shared module as a standard Android library (AAR) t
 - Gradle 8.5 (included via wrapper)
 
 **For iOS development (macOS only):**
+- macOS 14+
 - Xcode 15+
-- iOS 16.0+ SDK
+- iOS 26.0+ SDK
 - Command Line Tools for Xcode
+
+## API Keys
+
+Both apps require a Google Books API key:
+
+**Android:** Set in `local.properties`:
+```properties
+google.books.api.key=YOUR_KEY_HERE
+```
+
+**iOS:** Set in `Configuration.plist` or as environment variable `GOOGLE_BOOKS_API_KEY`
 
 ## Troubleshooting
 
-**"SDK location not found"**
+**"SDK location not found" (Android)**
 - Create `local.properties` in project root
 - Add line: `sdk.dir=/path/to/android/sdk`
 
-**iOS framework build fails on Linux**
-- This is expected. iOS compilation requires macOS with Xcode
-- The project is configured correctly; builds will work on macOS
+**iOS build requires macOS**
+- iOS development requires macOS with Xcode
+- Cannot build iOS apps on Linux/Windows
 
 **Gradle daemon memory issues**
 - Adjust `org.gradle.jvmargs` in `gradle.properties`

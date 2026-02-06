@@ -14,5 +14,4 @@ dependencyResolutionManagement {
 }
 
 rootProject.name = "Browsy"
-include(":shared")
 include(":androidApp")

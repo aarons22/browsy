@@ -2,6 +2,7 @@ plugins {
     alias(libs.plugins.androidApplication)
     alias(libs.plugins.kotlinAndroid)
     alias(libs.plugins.compose.compiler)
+    kotlin("plugin.serialization") version "2.0.0"
 }
 
 android {
@@ -43,7 +44,7 @@ android {
 }
 
 dependencies {
-    implementation(project(":shared"))
+    // Removed shared module dependency - now using native Android code
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.activity.compose)
     implementation(platform(libs.compose.bom))
@@ -54,5 +55,13 @@ dependencies {
     implementation(libs.compose.foundation)
     implementation(libs.lifecycle.viewmodel.compose)
     implementation(libs.coil.compose)
+    
+    // Ktor for networking (moved from shared module)
+    implementation(libs.ktor.client.core)
+    implementation(libs.ktor.client.okhttp)
+    implementation(libs.ktor.client.content.negotiation)
+    implementation(libs.ktor.serialization.kotlinx.json)
+    implementation(libs.kotlinx.serialization.json)
+    
     debugImplementation(libs.compose.ui.tooling)
 }

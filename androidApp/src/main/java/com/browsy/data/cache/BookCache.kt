@@ -3,12 +3,6 @@ package com.browsy.data.cache
 import com.browsy.data.model.Book
 
 /**
- * Returns current time in milliseconds since Unix epoch.
- * Platform-specific implementation provided via expect/actual.
- */
-internal expect fun currentTimeMillis(): Long
-
-/**
  * In-memory LRU cache for book data.
  *
  * This cache provides fast access to recently accessed books while managing memory usage

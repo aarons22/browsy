@@ -20,13 +20,13 @@ import android.content.SharedPreferences
  * }
  * ```
  */
-internal actual class LocalBookShelfStorage actual constructor() {
+internal class LocalBookShelfStorage {
 
-    actual fun save(data: String) {
+    fun save(data: String) {
         prefs.edit().putString(KEY, data).apply()
     }
 
-    actual fun load(): String? {
+    fun load(): String? {
         return prefs.getString(KEY, null)
     }
 
