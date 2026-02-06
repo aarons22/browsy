@@ -7,162 +7,182 @@
 I've created a detailed, step-by-step migration plan in **`.planning/KMP_TO_NATIVE_MIGRATION_PLAN.md`** that includes:
 
 - Complete code examples for every Swift file you'll need
-- Detailed instructions for creating the new iOS project
-- Android migration strategy that preserves your existing Kotlin code
+- Detailed instructions for creating the new iOS project (iOS 26+)
+- Android migration strategy with new project approach
 - Testing checklists for both platforms
 - Timeline estimates (6-9 days of focused work)
 - Risk mitigation strategies
 - Success criteria
 
-### 2. Set Up Swift Package Structure
+### 2. Updated Plan Based on Feedback
 
-Created **`iosApp/BrowsyShared/`** with:
-- `Package.swift` configured for iOS 18+
-- Directory structure for Models, API, Cache, Repository, Feed, and Utilities
-- Ready for Swift Package Manager integration
+**iOS 26.0 target**: Updated all references from iOS 18 to iOS 26
+**No separate Swift package**: Removed Swift Package Manager approach - all shared logic integrated directly into iOS app target
+**New Android project**: Updated to use clean slate approach (Option A) with all code in single app module
 
-### 3. Implemented Swift Data Models
+### 3. Documentation Structure
 
-Created four core models in `iosApp/BrowsyShared/Sources/BrowsyShared/Models/`:
-
-- **`Book.swift`**: Core book model with Codable, Identifiable, Equatable conformance
-- **`BookShelf.swift`**: Enum for TBR/RECOMMEND/READ shelves
-- **`SavedBook.swift`**: Model for saved books with shelf associations
-- **`BookCover.swift`**: Utility for managing cover URLs at different sizes
-
-All models include proper Swift documentation and match the Kotlin versions.
-
-### 4. Created Implementation Guide
-
-**`MIGRATION_SUMMARY.md`** provides:
-- Quick reference for what's done and what's next
-- Implementation tips for both platforms
-- Testing strategy
-- Estimated effort breakdown
-- Important notes about API keys and data migration
+Created three key documents:
+- **`.planning/KMP_TO_NATIVE_MIGRATION_PLAN.md`**: Comprehensive technical plan
+- **`MIGRATION_SUMMARY.md`**: Quick reference guide
+- **`MIGRATION_STATUS.md`**: This status document
 
 ## What You Need to Do Next
 
-### Option 1: Complete the Full Migration (Recommended)
+### Phase 1: Create New iOS Project (iOS 26+)
 
-Follow the detailed plan in `.planning/KMP_TO_NATIVE_MIGRATION_PLAN.md`:
+1. **Create Xcode project**:
+   - Template: iOS App, SwiftUI, Swift
+   - Minimum deployment: iOS 26.0
+   - Location: `iosApp/Browsy/`
 
-1. **Phase 1**: Complete Swift shared logic (2-3 days)
-   - Implement all API clients, DTOs, mappers, cache, and repositories
-   - All code is provided in the migration plan
+2. **Create directory structure** within the project:
+   ```
+   Browsy/
+   ├── Models/
+   ├── API/DTOs/, API/Mappers/, API files
+   ├── Cache/
+   ├── Repository/
+   ├── Feed/
+   ├── Utilities/
+   ├── Views/
+   └── ViewModels/
+   ```
 
-2. **Phase 2**: Create new iOS project (2 days)
-   - Create fresh Xcode project targeting iOS 18+
-   - Add BrowsyShared package
-   - Migrate existing SwiftUI views
+3. **Implement Swift code** using examples from migration plan:
+   - All shared logic in same target as app code
+   - No imports needed between components
+   - Uses native Swift async/await
 
-3. **Phase 3**: Migrate Android (1-2 days)
-   - Create `androidShared` module
-   - Copy Kotlin code from KMP shared module
-   - Update dependencies
+### Phase 2: Create New Android Project
 
-4. **Phase 4**: Cleanup (1-2 days)
-   - Remove KMP infrastructure
-   - Update documentation
-   - Test thoroughly
+1. **Create new project in Android Studio**:
+   - Template: Empty Activity (Compose)
+   - Create outside existing repo initially
+   - Minimum SDK: 24
 
-### Option 2: Incremental Migration
+2. **Copy code**:
+   - Kotlin shared logic from `shared/src/commonMain/`
+   - UI code from `androidApp/src/main/`
+   - All in single app module, organized by package
 
-You can migrate one platform at a time:
+3. **Update imports** from `com.browsy.` to `com.browsy.android.`
 
-1. **Complete iOS first** (Phases 1-2)
-   - Test thoroughly
-   - Keep Android on KMP during this time
+### Phase 3: Remove KMP Infrastructure
 
-2. **Then migrate Android** (Phase 3)
-   - Android migration is simpler (mostly copy-paste of Kotlin code)
+Once both new projects are working:
+- Delete `shared/` module
+- Delete old `androidApp/`
+- Delete old `iosApp/iosApp.xcodeproj/`
+- Update documentation
 
-3. **Finally cleanup** (Phase 4)
-   - Remove KMP only when both platforms are working
+## Key Decisions Made
 
-## Key Benefits of This Migration
+✅ **iOS target**: iOS 26.0 minimum
+✅ **iOS architecture**: Direct integration (no Swift package)
+✅ **Android approach**: New project (clean slate)
+✅ **Android architecture**: Single app module (no shared module)
 
-1. **No more KMP complexity**:
-   - No Swift/Kotlin interop issues
-   - No framework build scripts
-   - No expect/actual patterns
+## Questions & Decisions Needed
 
-2. **Native best practices**:
-   - iOS uses modern Swift concurrency (async/await, actors)
-   - Android uses Kotlin coroutines directly
-   - Each platform optimized for its ecosystem
+### 1. Repository Structure
 
-3. **Better development experience**:
-   - Faster builds (no KMP compilation)
-   - Better IDE support
-   - Easier debugging
-   - Simpler project structure
+**Question**: How do you want to organize the two separate native projects?
 
-4. **iOS 18+ target**:
-   - As requested, minimum deployment is iOS 18
-   - Can use latest SwiftUI features
+**Options**:
+- **A**: Keep both in same repo with structure like:
+  ```
+  browsy/
+  ├── ios/Browsy/           # iOS project
+  ├── android/              # Android project
+  └── docs/                 # Shared documentation
+  ```
+- **B**: Create two separate repositories:
+  - `browsy-ios` - iOS app
+  - `browsy-android` - Android app
+- **C**: Keep in existing repo structure:
+  ```
+  browsy/
+  ├── iosApp/Browsy/        # New iOS project here
+  ├── browsy-android/       # Android project here
+  └── .planning/            # Keep existing docs
+  ```
 
-## Important Notes
+**Recommendation**: Option C keeps things simple and preserves existing documentation.
 
-### API Key Management
+### 2. API Key Management
 
-Both the migration plan and I have included proper API key configuration:
+**Question**: How should API keys be managed for both platforms?
 
-- **iOS**: Use xcconfig files (never commit these to git)
-- **Android**: Use local.properties or BuildConfig
+**Current approach**:
+- iOS: xcconfig files (gitignored)
+- Android: local.properties (gitignored)
 
-### Data Migration
+**Should we**:
+- Keep separate config files? ✅ (Recommended - platform-standard approach)
+- Move to environment variables?
+- Use a shared secrets management service?
 
-If users have existing saved books:
-- iOS: May need migration script from KMP format
-- Android: SharedPreferences keys should stay compatible
+### 3. Shared Documentation
 
-### The Android Migration is Simpler
+**Question**: Should we have shared documentation between projects?
 
-Unlike iOS (which needs full rewrite to Swift), Android can mostly reuse the existing Kotlin code:
-- Copy files from `shared/src/commonMain/` to new `androidShared` module
-- Update only platform-specific parts (storage, HTTP client configuration)
-- ViewModels and UI code need minimal changes
+**Options**:
+- Keep design docs, wireframes, and API docs in shared location
+- Duplicate relevant docs in each project
+- Create a separate docs repo
 
-## Files Created
+**Recommendation**: Keep `.planning/`, `wireframe_sketches/`, and high-level docs in a shared location in the repo.
 
-1. **`.planning/KMP_TO_NATIVE_MIGRATION_PLAN.md`** (1,541 lines)
-   - Comprehensive plan with all code examples
-   - Your primary reference document
+### 4. Backend Integration
 
-2. **`MIGRATION_SUMMARY.md`**
-   - Quick reference guide
-   - Implementation tips and checklist
+**Question**: The `backend/` directory in the current repo - should it stay?
 
-3. **`iosApp/BrowsyShared/Package.swift`**
-   - Swift package configuration
+**Options**:
+- Keep backend in same repo structure
+- Move backend to separate repository
+- Document backend separately but keep in same repo for now
 
-4. **Swift Models** (in `iosApp/BrowsyShared/Sources/BrowsyShared/Models/`):
-   - `Book.swift`
-   - `BookShelf.swift`
-   - `SavedBook.swift`
-   - `BookCover.swift`
+**Recommendation**: Keep in same repo for now, can split later if needed.
 
-## Getting Started
+### 5. Version Synchronization
 
-1. **Read the migration plan**: Start with `.planning/KMP_TO_NATIVE_MIGRATION_PLAN.md`
+**Question**: How should we keep version numbers in sync between platforms?
 
-2. **Review the code examples**: All Swift implementations are provided in the plan
+**Options**:
+- Manual coordination
+- Shared version file that both projects reference
+- Independent versioning (iOS and Android can have different versions)
 
-3. **Follow Phase 1**: Implement the remaining Swift shared logic using the provided code
+**Recommendation**: Start with independent versioning, coordinate major releases manually.
 
-4. **Build incrementally**: Test each component as you build it
+### 6. Testing Strategy
 
-5. **Use the checklist**: Track progress with the testing checklists in the plan
+**Question**: Should we aim for feature parity before removing KMP, or migrate one platform at a time?
 
-## Questions or Issues?
+**Options**:
+- **A**: Complete iOS first, test thoroughly, then do Android
+- **B**: Do both in parallel, remove KMP when both are ready
+- **C**: iOS first, keep Android on KMP until iOS is production-ready
 
-The migration plan includes:
-- Detailed troubleshooting guidance
-- Testing strategies for each phase
-- Rollback plan if needed
-- Success criteria to know when you're done
+**Recommendation**: Option A (iOS first) - reduces risk, validates approach before duplicating effort.
 
-You have a complete roadmap to eliminate KMP while preserving all functionality. The foundation is laid with the Swift package structure and models. The rest is methodically implementing the remaining components using the provided code examples.
+### 7. Data Migration
 
-Good luck with the migration! The elimination of KMP complexity will make both apps much easier to maintain and develop going forward.
+**Question**: If users have data saved in the current KMP version, how should we handle migration?
+
+**Considerations**:
+- iOS uses UserDefaults - keys might change
+- Android uses SharedPreferences - should be compatible if we use same keys
+- Need migration scripts?
+
+**Action needed**: Review current data storage keys and plan migration if needed.
+
+## Next Actions Needed from You
+
+1. **Confirm architectural decisions** above
+2. **Answer questions** about repository structure, versioning, migration approach
+3. **Decide**: Start with iOS or do both in parallel?
+4. **Review** the detailed migration plan and ask any questions
+
+Once these are answered, you'll have a complete roadmap ready to execute.

@@ -18,90 +18,37 @@ The following Swift models have been created in `iosApp/BrowsyShared/Sources/Bro
 
 ### Immediate Next Steps (Phase 1)
 
-#### 1. Complete Swift Shared Logic Implementation
-
-All the detailed Swift implementations are documented in the migration plan. You need to create these files:
-
-**API Layer** (`Sources/BrowsyShared/API/`):
-- `DTOs/GoogleBooksDTO.swift` - All Google Books API response models
-- `DTOs/OpenLibraryDTO.swift` - All Open Library API response models
-- `GoogleBooksAPI.swift` - Native URLSession-based API client
-- `OpenLibraryAPI.swift` - Native URLSession-based API client
-- `Mappers/GoogleBooksMapper.swift` - Convert DTOs to Book model
-- `Mappers/OpenLibraryMapper.swift` - Convert DTOs to Book model
-
-**Utilities** (`Sources/BrowsyShared/Utilities/`):
-- `ImageUrlEnhancer.swift` - Enhance cover image URLs for quality
-
-**Cache** (`Sources/BrowsyShared/Cache/`):
-- `BookCache.swift` - Actor-based in-memory cache with TTL
-
-**Repository** (`Sources/BrowsyShared/Repository/`):
-- `BookRepository.swift` - Main repository with dual-API fallback
-- `LocalBookShelfStorage.swift` - UserDefaults-based storage
-- `LocalBookShelfRepository.swift` - Business logic for shelf operations
-
-**Feed** (`Sources/BrowsyShared/Feed/`):
-- `FeedStrategy.swift` - Smart query rotation for feed variety
-
-#### 2. Create New iOS Project
+#### 1. Create New iOS Project (iOS 26+)
 
 1. Open Xcode and create a new project:
    - Template: iOS App
    - Interface: SwiftUI
    - Language: Swift
-   - Minimum deployment: iOS 18.0
+   - Minimum deployment: iOS 26.0
    - Location: `iosApp/Browsy/`
 
-2. Add the BrowsyShared package as a local dependency
+2. Set up directory structure directly in the project:
+   - All shared logic goes directly in the app target
+   - Organized as: Models/, API/, Cache/, Repository/, Feed/, Utilities/
+   - Views and ViewModels alongside shared code
 
-3. Migrate existing SwiftUI views from `iosApp/iosApp/`:
-   - Copy `BookFeedView.swift`, `BookInfoSheet.swift`, `ContentView.swift`
-   - Remove `import shared` and replace with `import BrowsyShared`
-   - Update ViewModels to use native Swift async/await APIs
+3. Implement Swift versions of shared logic in the project:
+   - All code examples provided in the migration plan
+   - No separate Swift package needed
 
-4. Configure API key in xcconfig file:
-   ```
-   # Development.xcconfig
-   GOOGLE_BOOKS_API_KEY = your_api_key_here
-   ```
+#### 2. Create New Android Project
 
-### Phase 2: Android Migration
+1. **Create new Android project in Android Studio**:
+   - File → New → New Project
+   - Template: Empty Activity (Compose)
+   - Location: Create as new project (not in existing repo initially)
+   - Minimum SDK: 24
 
-1. **Create androidShared module**:
-   ```
-   mkdir -p androidShared/src/main/kotlin/com/browsy/shared
-   ```
-
-2. **Copy Kotlin code from KMP shared module**:
-   - Copy all files from `shared/src/commonMain/kotlin/` to `androidShared/src/main/kotlin/`
-   - Replace Ktor client configuration with OkHttp
-   - Update storage to use Android SharedPreferences
-
-3. **Update androidApp**:
-   - Change dependency from `implementation(project(":shared"))` to `implementation(project(":androidShared"))`
-   - No changes needed to ViewModels or UI code
-
-4. **Update settings.gradle.kts**:
-   - Add `include(":androidShared")`
-   - Remove `include(":shared")`
-
-### Phase 3: Cleanup
-
-1. **Remove KMP infrastructure**:
-   ```bash
-   rm -rf shared/
-   rm -rf iosApp/iosApp.xcodeproj/  # Old KMP Xcode project
-   ```
-
-2. **Update root Gradle files**:
-   - Remove KMP plugins from `build.gradle.kts`
-   - Remove KMP dependencies from `gradle/libs.versions.toml`
-
-3. **Update documentation**:
-   - Replace PROJECT_STRUCTURE.md content with native architecture
-   - Update README.md with new build instructions
-   - Update CLAUDE.md to remove KMP-specific guidance
+2. **Integrate all code in single app module**:
+   - Copy Kotlin shared logic from `shared/src/commonMain/`
+   - Copy UI code from `androidApp/src/main/`
+   - Place in organized packages, all in app module
+   - No separate shared module needed
 
 ## Key Implementation Tips
 

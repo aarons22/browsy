@@ -33,29 +33,57 @@ This document provides a comprehensive plan for migrating the Browsy app from Ko
 
 ### Phase 1: Create Native Swift Shared Logic
 
-#### 1.1 Swift Package Setup
+#### 1.1 iOS Project Structure Setup
+
+Instead of a separate Swift package, shared logic will be integrated directly into the iOS project:
+
 ```bash
-# Create Swift package structure
-iosApp/BrowsyShared/
-├── Package.swift
-├── Sources/BrowsyShared/
+# Create directory structure within iOS project
+iosApp/Browsy/
+├── Browsy/
+│   ├── BrowsyApp.swift
 │   ├── Models/
+│   │   ├── Book.swift
+│   │   ├── BookShelf.swift
+│   │   ├── SavedBook.swift
+│   │   └── BookCover.swift
 │   ├── API/
+│   │   ├── DTOs/
+│   │   │   ├── GoogleBooksDTO.swift
+│   │   │   └── OpenLibraryDTO.swift
+│   │   ├── GoogleBooksAPI.swift
+│   │   ├── OpenLibraryAPI.swift
+│   │   └── Mappers/
+│   │       ├── GoogleBooksMapper.swift
+│   │       └── OpenLibraryMapper.swift
 │   ├── Cache/
+│   │   └── BookCache.swift
 │   ├── Repository/
+│   │   ├── BookRepository.swift
+│   │   ├── LocalBookShelfStorage.swift
+│   │   └── LocalBookShelfRepository.swift
 │   ├── Feed/
-│   └── Utilities/
-└── Tests/BrowsySharedTests/
+│   │   └── FeedStrategy.swift
+│   ├── Utilities/
+│   │   └── ImageUrlEnhancer.swift
+│   ├── Views/
+│   │   ├── BookFeedView.swift
+│   │   ├── BookInfoSheet.swift
+│   │   └── ContentView.swift
+│   └── ViewModels/
+│       ├── FeedViewModel.swift
+│       └── ShelfViewModel.swift
+└── BrowsyTests/
 ```
 
-**Package.swift Configuration**:
-- Platform: iOS 18+
+**Project Configuration**:
+- Platform: iOS 26.0+ minimum deployment target
 - No external dependencies (use native URLSession)
-- Target: BrowsyShared library
+- All shared logic as part of main app target
 
 #### 1.2 Data Models Migration
 
-Files to create in `Sources/BrowsyShared/Models/`:
+Files to create in `Browsy/Models/`:
 
 **Book.swift**:
 ```swift
@@ -104,7 +132,7 @@ public struct BookCover: Equatable {
 
 #### 1.3 API DTOs Migration
 
-Files to create in `Sources/BrowsyShared/API/DTOs/`:
+Files to create in `Browsy/API/DTOs/`:
 
 **GoogleBooksDTO.swift**:
 ```swift
@@ -200,7 +228,7 @@ public struct Identifiers: Codable {
 
 #### 1.4 API Clients Migration
 
-Files to create in `Sources/BrowsyShared/API/`:
+Files to create in `Browsy/API/`:
 
 **GoogleBooksAPI.swift**:
 ```swift
@@ -304,7 +332,7 @@ public actor OpenLibraryAPI {
 
 #### 1.5 Mappers Migration
 
-Files to create in `Sources/BrowsyShared/API/Mappers/`:
+Files to create in `Browsy/API/Mappers/`:
 
 **GoogleBooksMapper.swift**:
 ```swift
@@ -360,7 +388,7 @@ public struct OpenLibraryMapper {
 
 #### 1.6 Utilities Migration
 
-Files to create in `Sources/BrowsyShared/Utilities/`:
+Files to create in `Browsy/Utilities/`:
 
 **ImageUrlEnhancer.swift**:
 ```swift
@@ -400,7 +428,7 @@ public struct ImageUrlEnhancer {
 
 #### 1.7 Cache Migration
 
-Files to create in `Sources/BrowsyShared/Cache/`:
+Files to create in `Browsy/Cache/`:
 
 **BookCache.swift**:
 ```swift
@@ -457,7 +485,7 @@ public actor BookCache {
 
 #### 1.8 Repository Migration
 
-Files to create in `Sources/BrowsyShared/Repository/`:
+Files to create in `Browsy/Repository/`:
 
 **BookRepository.swift**:
 ```swift
@@ -543,7 +571,7 @@ public actor BookRepository {
 
 #### 1.9 Feed Strategy Migration
 
-Files to create in `Sources/BrowsyShared/Feed/`:
+Files to create in `Browsy/Feed/`:
 
 **FeedStrategy.swift**:
 ```swift
@@ -565,7 +593,7 @@ public struct FeedStrategy {
 
 #### 1.10 Local Storage Migration
 
-Files to create in `Sources/BrowsyShared/Repository/`:
+Files to create in `Browsy/Repository/`:
 
 **LocalBookShelfStorage.swift**:
 ```swift
@@ -648,7 +676,7 @@ public actor LocalBookShelfRepository {
 }
 ```
 
-### Phase 2: Create New Native iOS Project (iOS 18+)
+### Phase 2: Create New Native iOS Project (iOS 26+)
 
 #### 2.1 Xcode Project Setup
 
@@ -656,12 +684,10 @@ public actor LocalBookShelfRepository {
    - Template: iOS App
    - Interface: SwiftUI
    - Language: Swift
-   - Minimum deployment: iOS 18.0
+   - Minimum deployment: iOS 26.0
    - Location: `iosApp/Browsy/`
 
-2. **Add BrowsyShared package**:
-   - File → Add Package Dependencies
-   - Add Local Package: `../BrowsyShared`
+2. **Create directory structure** as outlined in Phase 1.1 above
 
 3. **Configure Info.plist**:
    ```xml
@@ -677,30 +703,15 @@ public actor LocalBookShelfRepository {
 
 #### 2.2 Migrate iOS Views
 
-**Project Structure**:
-```
-Browsy/
-├── BrowsyApp.swift
-├── Views/
-│   ├── BookFeedView.swift
-│   ├── BookInfoSheet.swift
-│   └── ContentView.swift
-├── ViewModels/
-│   ├── FeedViewModel.swift
-│   └── ShelfViewModel.swift
-└── Assets.xcassets/
-```
-
 **Update ViewModels**:
 - Remove `import shared`
-- Add `import BrowsyShared`
+- All shared logic is now part of the same target, no imports needed
 - Update API calls to use Swift async/await
 - Remove KMP-specific type conversions
 
 **FeedViewModel.swift** (updated):
 ```swift
 import Foundation
-import BrowsyShared
 
 @MainActor
 class FeedViewModel: ObservableObject {
@@ -781,58 +792,79 @@ class FeedViewModel: ObservableObject {
 </dict>
 ```
 
-### Phase 3: Migrate Android to Native Kotlin/JVM
+### Phase 3: Create New Android Project
 
-#### 3.1 Create New Android Project Structure
+#### 3.1 Create Clean Slate Android Project
 
-**Option A: Clean Slate (Recommended)**
+Following the requirement to start fresh with a new Android project:
 
-1. Create new Android project:
-   ```bash
-   # Use Android Studio: File → New → New Project
-   # Template: Empty Activity (Compose)
-   # Language: Kotlin
-   # Minimum SDK: 24
-   # Package: com.browsy.android
+1. **Create new Android project in Android Studio**:
+   - File → New → New Project
+   - Template: Empty Activity (Compose)
+   - Language: Kotlin
+   - Minimum SDK: 24
+   - Target SDK: 34
+   - Package: com.browsy.android
+   - Location: Create outside existing repo initially
+
+2. **Set up project structure**:
+   ```
+   browsy-android/
+   ├── app/
+   │   ├── src/main/
+   │   │   ├── kotlin/com/browsy/android/
+   │   │   │   ├── MainActivity.kt
+   │   │   │   ├── BrowsyApplication.kt
+   │   │   │   ├── models/
+   │   │   │   ├── api/
+   │   │   │   ├── cache/
+   │   │   │   ├── repository/
+   │   │   │   ├── feed/
+   │   │   │   ├── utilities/
+   │   │   │   ├── ui/
+   │   │   │   │   ├── feed/
+   │   │   │   │   ├── info/
+   │   │   │   │   └── theme/
+   │   │   │   └── viewmodels/
+   │   │   └── AndroidManifest.xml
+   │   └── build.gradle.kts
+   ├── settings.gradle.kts
+   └── build.gradle.kts
    ```
 
-2. Copy existing UI code from `androidApp/src/main/`
+3. **Integrate all code in the main app module** (no separate shared module needed):
+   - All shared logic goes directly in the app module
+   - Organized by package rather than module
+   - Simpler project structure, easier to maintain
 
-**Option B: In-Place Migration**
+#### 3.2 Port Shared Logic to New Android Project
 
-1. Keep existing `androidApp/` structure
-2. Remove KMP dependency from `build.gradle.kts`
-3. Create new Kotlin source sets for shared logic
-
-#### 3.2 Create Android Shared Module
-
-**Structure**:
-```
-androidShared/
-├── build.gradle.kts
-└── src/main/kotlin/com/browsy/shared/
-    ├── models/
-    ├── api/
-    ├── cache/
-    ├── repository/
-    ├── feed/
-    └── utilities/
-```
-
-**build.gradle.kts**:
+**app/build.gradle.kts**:
 ```kotlin
 plugins {
-    id("com.android.library")
+    id("com.android.application")
     id("org.jetbrains.kotlin.android")
     id("org.jetbrains.kotlin.plugin.serialization")
 }
 
 android {
-    namespace = "com.browsy.shared"
+    namespace = "com.browsy.android"
     compileSdk = 34
 
     defaultConfig {
+        applicationId = "com.browsy.android"
         minSdk = 24
+        targetSdk = 34
+        versionCode = 1
+        versionName = "1.0"
+    }
+
+    buildFeatures {
+        compose = true
+    }
+
+    composeOptions {
+        kotlinCompilerExtensionVersion = "1.5.8"
     }
 
     compileOptions {
@@ -856,12 +888,29 @@ dependencies {
 
     // Kotlinx Serialization
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.6.2")
+
+    // Compose
+    implementation(platform("androidx.compose:compose-bom:2024.01.00"))
+    implementation("androidx.compose.ui:ui")
+    implementation("androidx.compose.ui:ui-graphics")
+    implementation("androidx.compose.ui:ui-tooling-preview")
+    implementation("androidx.compose.material3:material3")
+    implementation("androidx.compose.foundation:foundation")
+
+    // Android Core
+    implementation("androidx.core:core-ktx:1.12.0")
+    implementation("androidx.activity:activity-compose:1.8.2")
+    implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.7.0")
+
+    // Image loading
+    implementation("io.coil-kt:coil-compose:2.5.0")
+
+    // Debug
+    debugImplementation("androidx.compose.ui:ui-tooling")
 }
 ```
 
-#### 3.3 Port Shared Logic to Android
-
-**Key Changes**:
+**Key Changes from KMP**:
 1. Keep Kotlin code from `shared/src/commonMain/`
 2. Replace platform-specific code from `shared/src/androidMain/`
 3. Use OkHttp instead of Ktor's platform-specific client
@@ -897,30 +946,33 @@ class LocalBookShelfStorage(private val context: Context) {
 }
 ```
 
-#### 3.4 Update Android App Module
+#### 3.3 Copy and Update Code
 
-**androidApp/build.gradle.kts**:
-```kotlin
-dependencies {
-    implementation(project(":androidShared"))
+**Migration Process**:
 
-    // Remove: implementation(project(":shared"))
+1. **Copy Kotlin models, APIs, repositories** from `shared/src/commonMain/` to new project:
+   - Place in appropriate packages under `com.browsy.android`
+   - No module separation needed - all in app module
 
-    implementation(libs.androidx.core.ktx)
-    implementation(libs.androidx.activity.compose)
-    implementation(platform(libs.compose.bom))
-    implementation(libs.compose.ui)
-    implementation(libs.compose.material3)
-    implementation(libs.lifecycle.viewmodel.compose)
-    implementation(libs.coil.compose)
-}
-```
+2. **Copy UI code** from `androidApp/src/main/`:
+   - Compose UI components go to `ui/` package
+   - ViewModels go to `viewmodels/` package
+   - Theme stays in `ui/theme/`
+
+3. **Update imports**:
+   - Change `import com.browsy.` to `import com.browsy.android.`
+   - No more shared module imports needed
 
 **Update ViewModels**:
 ```kotlin
-import com.browsy.shared.repository.BookRepository
-import com.browsy.shared.models.Book
-import com.browsy.shared.feed.FeedStrategy
+package com.browsy.android.viewmodels
+
+import android.app.Application
+import androidx.lifecycle.AndroidViewModel
+import androidx.lifecycle.viewModelScope
+import com.browsy.android.repository.BookRepository
+import com.browsy.android.models.Book
+import com.browsy.android.feed.FeedStrategy
 
 class FeedViewModel(application: Application) : AndroidViewModel(application) {
     private val repository = BookRepository.create(
@@ -931,14 +983,18 @@ class FeedViewModel(application: Application) : AndroidViewModel(application) {
 }
 ```
 
-#### 3.5 Update Settings
+#### 3.4 Configuration
 
-**settings.gradle.kts**:
+**settings.gradle.kts** (simple, single module):
 ```kotlin
 rootProject.name = "Browsy"
-include(":androidApp")
-include(":androidShared")
-// Remove: include(":shared")
+include(":app")
+```
+
+**local.properties**:
+```properties
+sdk.dir=/path/to/android/sdk
+google.books.api.key=your_api_key_here
 ```
 
 ### Phase 4: Remove KMP Infrastructure
@@ -946,14 +1002,25 @@ include(":androidShared")
 #### 4.1 Delete KMP Files
 
 ```bash
-# Remove shared KMP module
+# Remove shared KMP module entirely
 rm -rf shared/
 
-# Remove iOS framework build configurations
-rm -rf iosApp/iosApp.xcodeproj  # Old KMP-based project
+# Remove old iOS KMP-based Xcode project
+rm -rf iosApp/iosApp.xcodeproj
+rm -rf iosApp/iosApp/  # Old KMP iOS app
+
+# Remove old Android KMP-based app
+rm -rf androidApp/
+
+# Remove BrowsyShared Swift package (not needed with new approach)
+rm -rf iosApp/BrowsyShared/
 ```
 
-#### 4.2 Clean Up Root Gradle Files
+#### 4.2 Clean Up Root Gradle Files (if keeping any shared repo structure)
+
+Note: Since we're creating completely separate projects, you may not need root Gradle files at all.
+
+If you want to keep the repo structure with both projects:
 
 **build.gradle.kts**:
 ```kotlin
