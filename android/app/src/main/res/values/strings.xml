@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Browsy</string>
+    <!-- Replace with your actual Google Books API key -->
+    <string name="google_books_api_key">YOUR_API_KEY_HERE</string>
+</resources>

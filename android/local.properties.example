@@ -1,0 +1,6 @@
+# Android SDK location
+sdk.dir=/path/to/android/sdk
+
+# Google Books API Key
+# Get your API key from https://console.cloud.google.com/
+google.books.api.key=YOUR_API_KEY_HERE

@@ -1,69 +1,41 @@
+# macOS
 .DS_Store
 
-# Gradle
-.gradle/
-build/
-!gradle/wrapper/gradle-wrapper.jar
-local.properties
-gradle.properties.local
-
-# IDE
+# IDEs
 .idea/
-*.iml
-.fleet/
-
-# Kotlin
-*.class
-*.jar
-!gradle/wrapper/gradle-wrapper.jar
-
-# Android
-*.apk
-*.ap_
-*.dex
-*.aab
-.cxx/
-captures/
+.vscode/
 
 # iOS
-*.xcuserdata/
-xcuserdata/
-*.xcworkspace/
-!*.xcworkspace/contents.xcworkspacedata
-DerivedData/
-*.framework/
-*.xcframework/
-Pods/
-*.moved-aside
-*.pbxuser
-*.mode1v3
-*.mode2v3
-*.perspectivev3
-!default.pbxuser
-!default.mode1v3
-!default.mode2v3
-!default.perspectivev3
-xcshareddata/
-*.hmap
-*.ipa
-*.dSYM.zip
-*.dSYM
+ios/**/*.xcodeproj/xcuserdata/
+ios/**/*.xcodeproj/project.xcworkspace/xcuserdata/
+ios/**/DerivedData/
+ios/**/*.xcconfig
+!ios/**/Config/*.xcconfig.template
+ios/**/Pods/
+ios/**/*.xcworkspace
+ios/**/build/
 
-# KMP specific
-shared/build/
-kotlin-js-store/
+# Android
+android/.gradle/
+android/app/build/
+android/local.properties
+android/.idea/
+android/build/
+android/captures/
+android/.externalNativeBuild/
+android/.cxx/
 
-# Secrets
-*.keystore
-*.jks
-google-services.json
-GoogleService-Info.plist
-.kotlin
-
-# Node.js / Backend
+# Backend
 backend/node_modules/
+backend/.env
+backend/lib/
 backend/dist/
-backend/*.log
-backend/.env*
-!backend/.env.example
-backend/credentials/*.json
+
+# Local configuration
+local.properties
+
+# Temporary files
+/tmp/
+*.swp
+*.swo
+*~
