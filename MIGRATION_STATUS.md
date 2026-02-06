@@ -83,106 +83,72 @@ Once both new projects are working:
 ✅ **Android approach**: New project (clean slate)
 ✅ **Android architecture**: Single app module (no shared module)
 
-## Questions & Decisions Needed
+## Decisions Confirmed ✅
 
-### 1. Repository Structure
+Based on your feedback, here are the finalized architectural decisions:
 
-**Question**: How do you want to organize the two separate native projects?
+### 1. Repository Structure ✅
+**Decision**: Top-level folders for each platform
+```
+browsy/
+├── ios/                  # iOS project
+├── android/              # Android project
+├── backend/              # Backend services
+├── .planning/            # Shared documentation
+├── wireframe_sketches/   # Shared design docs
+└── README.md             # Project overview
+```
 
-**Options**:
-- **A**: Keep both in same repo with structure like:
-  ```
-  browsy/
-  ├── ios/Browsy/           # iOS project
-  ├── android/              # Android project
-  └── docs/                 # Shared documentation
-  ```
-- **B**: Create two separate repositories:
-  - `browsy-ios` - iOS app
-  - `browsy-android` - Android app
-- **C**: Keep in existing repo structure:
-  ```
-  browsy/
-  ├── iosApp/Browsy/        # New iOS project here
-  ├── browsy-android/       # Android project here
-  └── .planning/            # Keep existing docs
-  ```
+### 2. API Key Management ✅
+**Decision**: Keep separate platform-standard config files
+- iOS: `.xcconfig` files (gitignored)
+- Android: `local.properties` (gitignored)
 
-**Recommendation**: Option C keeps things simple and preserves existing documentation.
+### 3. Shared Documentation ✅
+**Decision**: Keep shared documentation in repo root
+- `.planning/` - Technical documentation
+- `wireframe_sketches/` - Design documents
+- High-level project docs remain accessible to both platforms
 
-### 2. API Key Management
+### 4. Backend Integration ✅
+**Decision**: Keep `backend/` directory in same repo
+- Maintains monorepo structure
+- Can split later if needed
 
-**Question**: How should API keys be managed for both platforms?
+### 5. Version Synchronization ✅
+**Decision**: Independent versioning for each platform
+- iOS and Android can have different version numbers
+- Coordinate major releases manually
 
-**Current approach**:
-- iOS: xcconfig files (gitignored)
-- Android: local.properties (gitignored)
+### 6. Testing Strategy ✅
+**Decision**: Complete iOS first, then Android (Option A)
+- Reduces risk
+- Validates approach before duplicating effort
+- iOS and Android are separate tasks due to separate folder structure
 
-**Should we**:
-- Keep separate config files? ✅ (Recommended - platform-standard approach)
-- Move to environment variables?
-- Use a shared secrets management service?
+### 7. Data Migration ✅
+**Decision**: Not a concern - no existing users
+- No migration needed for this initial release
 
-### 3. Shared Documentation
+## Updated Migration Phases
 
-**Question**: Should we have shared documentation between projects?
+### Phase 1: iOS Migration (Priority)
+1. Create new iOS project in `ios/` directory
+2. Implement all Swift shared logic directly in app target
+3. Migrate SwiftUI views
+4. Test thoroughly
 
-**Options**:
-- Keep design docs, wireframes, and API docs in shared location
-- Duplicate relevant docs in each project
-- Create a separate docs repo
+### Phase 2: Android Migration (After iOS Complete)
+1. Create new Android project in `android/` directory
+2. Copy Kotlin shared logic from KMP module
+3. Integrate in single app module
+4. Test thoroughly
 
-**Recommendation**: Keep `.planning/`, `wireframe_sketches/`, and high-level docs in a shared location in the repo.
+### Phase 3: Cleanup
+1. Remove old KMP infrastructure (`shared/`, `iosApp/`, `androidApp/`)
+2. Update root-level documentation
+3. Update `.gitignore` for new structure
 
-### 4. Backend Integration
+## Next Steps
 
-**Question**: The `backend/` directory in the current repo - should it stay?
-
-**Options**:
-- Keep backend in same repo structure
-- Move backend to separate repository
-- Document backend separately but keep in same repo for now
-
-**Recommendation**: Keep in same repo for now, can split later if needed.
-
-### 5. Version Synchronization
-
-**Question**: How should we keep version numbers in sync between platforms?
-
-**Options**:
-- Manual coordination
-- Shared version file that both projects reference
-- Independent versioning (iOS and Android can have different versions)
-
-**Recommendation**: Start with independent versioning, coordinate major releases manually.
-
-### 6. Testing Strategy
-
-**Question**: Should we aim for feature parity before removing KMP, or migrate one platform at a time?
-
-**Options**:
-- **A**: Complete iOS first, test thoroughly, then do Android
-- **B**: Do both in parallel, remove KMP when both are ready
-- **C**: iOS first, keep Android on KMP until iOS is production-ready
-
-**Recommendation**: Option A (iOS first) - reduces risk, validates approach before duplicating effort.
-
-### 7. Data Migration
-
-**Question**: If users have data saved in the current KMP version, how should we handle migration?
-
-**Considerations**:
-- iOS uses UserDefaults - keys might change
-- Android uses SharedPreferences - should be compatible if we use same keys
-- Need migration scripts?
-
-**Action needed**: Review current data storage keys and plan migration if needed.
-
-## Next Actions Needed from You
-
-1. **Confirm architectural decisions** above
-2. **Answer questions** about repository structure, versioning, migration approach
-3. **Decide**: Start with iOS or do both in parallel?
-4. **Review** the detailed migration plan and ask any questions
-
-Once these are answered, you'll have a complete roadmap ready to execute.
+With all decisions confirmed, you can now proceed with implementation following the detailed migration plan in `.planning/KMP_TO_NATIVE_MIGRATION_PLAN.md`.

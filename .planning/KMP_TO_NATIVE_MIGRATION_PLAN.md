@@ -4,6 +4,35 @@
 
 This document provides a comprehensive plan for migrating the Browsy app from Kotlin Multiplatform Mobile (KMP) to fully native iOS (Swift) and Android (Kotlin/JVM) implementations. This migration will eliminate KMP complexity while maintaining feature parity.
 
+## Target Repository Structure
+
+After migration, the repository will be organized as:
+
+```
+browsy/
+├── ios/                  # iOS project (iOS 26+)
+│   └── Browsy/           # Xcode project
+├── android/              # Android project (new, clean slate)
+│   └── app/              # Single app module
+├── backend/              # Backend services (unchanged)
+├── .planning/            # Shared technical documentation
+├── wireframe_sketches/   # Shared design documents
+├── README.md             # Project overview
+└── .gitignore            # Updated for new structure
+```
+
+## Migration Strategy Overview
+
+**Approach**: Sequential migration (iOS first, then Android)
+- **Phase 1**: iOS migration to `ios/` directory
+- **Phase 2**: Android migration to `android/` directory
+- **Phase 3**: Cleanup of KMP infrastructure
+
+**Rationale**:
+- Validates architecture before duplicating effort
+- Reduces risk
+- iOS and Android can be developed as separate tasks
+
 ## Current Architecture
 
 ### Shared Module (KMP)
@@ -39,7 +68,7 @@ Instead of a separate Swift package, shared logic will be integrated directly in
 
 ```bash
 # Create directory structure within iOS project
-iosApp/Browsy/
+ios/Browsy/
 ├── Browsy/
 │   ├── BrowsyApp.swift
 │   ├── Models/
@@ -685,7 +714,7 @@ public actor LocalBookShelfRepository {
    - Interface: SwiftUI
    - Language: Swift
    - Minimum deployment: iOS 26.0
-   - Location: `iosApp/Browsy/`
+   - Location: `ios/Browsy/`
 
 2. **Create directory structure** as outlined in Phase 1.1 above
 
@@ -805,11 +834,11 @@ Following the requirement to start fresh with a new Android project:
    - Minimum SDK: 24
    - Target SDK: 34
    - Package: com.browsy.android
-   - Location: Create outside existing repo initially
+   - **Location**: `android/` (in repo root)
 
 2. **Set up project structure**:
    ```
-   browsy-android/
+   android/
    ├── app/
    │   ├── src/main/
    │   │   ├── kotlin/com/browsy/android/
@@ -1001,63 +1030,70 @@ google.books.api.key=your_api_key_here
 
 #### 4.1 Delete KMP Files
 
+Once both iOS and Android migrations are complete and tested:
+
 ```bash
 # Remove shared KMP module entirely
 rm -rf shared/
 
-# Remove old iOS KMP-based Xcode project
-rm -rf iosApp/iosApp.xcodeproj
-rm -rf iosApp/iosApp/  # Old KMP iOS app
+# Remove old iOS KMP-based project
+rm -rf iosApp/
 
 # Remove old Android KMP-based app
 rm -rf androidApp/
 
-# Remove BrowsyShared Swift package (not needed with new approach)
-rm -rf iosApp/BrowsyShared/
+# Remove any KMP-specific root files
+rm -f settings.gradle.kts  # No longer needed with separate projects
+rm -f build.gradle.kts     # No longer needed with separate projects
+rm -f gradle.properties    # No longer needed with separate projects
+rm -rf gradle/             # No longer needed with separate projects
 ```
 
-#### 4.2 Clean Up Root Gradle Files (if keeping any shared repo structure)
+#### 4.2 Update Repository Structure
 
-Note: Since we're creating completely separate projects, you may not need root Gradle files at all.
+After cleanup, the repository structure will be:
 
-If you want to keep the repo structure with both projects:
-
-**build.gradle.kts**:
-```kotlin
-plugins {
-    alias(libs.plugins.androidApplication) apply false
-    alias(libs.plugins.androidLibrary) apply false
-    alias(libs.plugins.kotlinAndroid) apply false
-    alias(libs.plugins.compose.compiler) apply false
-    // Remove: alias(libs.plugins.kotlinMultiplatform) apply false
-}
+```bash
+browsy/
+├── ios/                  # iOS project
+├── android/              # Android project
+├── backend/              # Backend services
+├── .planning/            # Shared documentation
+├── wireframe_sketches/   # Shared design docs
+├── README.md             # Updated project overview
+└── .gitignore            # Updated for new structure
 ```
 
-**gradle/libs.versions.toml**:
-Remove KMP-specific dependencies:
-```toml
-[plugins]
-# Remove kotlinMultiplatform
-# Remove buildkonfig
-```
 
 #### 4.3 Update .gitignore
 
+Update the `.gitignore` file for the new structure:
+
 ```gitignore
 # iOS
-iosApp/Browsy/*.xcodeproj/xcuserdata/
-iosApp/Browsy/*.xcodeproj/project.xcworkspace/xcuserdata/
-iosApp/Browsy/DerivedData/
-*.xcconfig  # Don't commit API keys
+ios/**/*.xcodeproj/xcuserdata/
+ios/**/*.xcodeproj/project.xcworkspace/xcuserdata/
+ios/**/DerivedData/
+ios/**/*.xcconfig  # Don't commit API keys
+ios/**/Pods/
+ios/**/*.xcworkspace
 
 # Android
-androidApp/build/
-androidShared/build/
-.gradle/
-local.properties
+android/.gradle/
+android/app/build/
+android/local.properties
+android/.idea/
 
-# Remove KMP-specific ignores
-# shared/build/
+# Backend
+backend/node_modules/
+backend/.env
+
+# macOS
+.DS_Store
+
+# IDEs
+.idea/
+.vscode/
 ```
 
 ### Phase 5: Update Documentation
@@ -1076,7 +1112,7 @@ Native iOS (Swift) and Android (Kotlin/JVM) applications with platform-specific 
 ## Modules
 
 ### iOS App: Browsy
-- **Location**: `iosApp/Browsy/`
+- **Location**: `ios/Browsy/`
 - **Framework**: SwiftUI
 - **Minimum iOS**: 18.0
 - **Dependencies**: BrowsyShared (Swift Package)
@@ -1108,10 +1144,10 @@ Update build instructions:
 ### iOS (macOS only)
 ```bash
 # Open in Xcode
-open iosApp/Browsy/Browsy.xcodeproj
+open ios/Browsy/Browsy.xcodeproj
 
 # Or build from command line
-xcodebuild -project iosApp/Browsy/Browsy.xcodeproj \
+xcodebuild -project ios/Browsy/Browsy.xcodeproj \
   -scheme Browsy \
   -configuration Debug \
   build

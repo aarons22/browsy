@@ -16,7 +16,7 @@ The following Swift models have been created in `iosApp/BrowsyShared/Sources/Bro
 
 ## What Needs to Be Done
 
-### Immediate Next Steps (Phase 1)
+### Phase 1: iOS Migration (Priority)
 
 #### 1. Create New iOS Project (iOS 26+)
 
@@ -25,7 +25,7 @@ The following Swift models have been created in `iosApp/BrowsyShared/Sources/Bro
    - Interface: SwiftUI
    - Language: Swift
    - Minimum deployment: iOS 26.0
-   - Location: `iosApp/Browsy/`
+   - **Location**: `ios/Browsy/` (in repo root)
 
 2. Set up directory structure directly in the project:
    - All shared logic goes directly in the app target
@@ -36,12 +36,20 @@ The following Swift models have been created in `iosApp/BrowsyShared/Sources/Bro
    - All code examples provided in the migration plan
    - No separate Swift package needed
 
-#### 2. Create New Android Project
+#### 2. Test iOS Implementation
+
+1. Build and test on iOS 26+ devices/simulators
+2. Verify all features work as expected
+3. Complete testing before starting Android migration
+
+### Phase 2: Android Migration (After iOS Complete)
+
+#### 1. Create New Android Project
 
 1. **Create new Android project in Android Studio**:
    - File → New → New Project
    - Template: Empty Activity (Compose)
-   - Location: Create as new project (not in existing repo initially)
+   - **Location**: `android/` (in repo root)
    - Minimum SDK: 24
 
 2. **Integrate all code in single app module**:
@@ -49,6 +57,18 @@ The following Swift models have been created in `iosApp/BrowsyShared/Sources/Bro
    - Copy UI code from `androidApp/src/main/`
    - Place in organized packages, all in app module
    - No separate shared module needed
+
+#### 2. Test Android Implementation
+
+1. Build and test on Android devices/emulators
+2. Verify all features work as expected
+
+### Phase 3: Cleanup
+
+Once both platforms are working:
+1. Remove old KMP infrastructure (`shared/`, `iosApp/`, `androidApp/`)
+2. Update `.gitignore` for new structure
+3. Update documentation
 
 ## Key Implementation Tips
 
