@@ -1114,7 +1114,7 @@ Native iOS (Swift) and Android (Kotlin/JVM) applications with platform-specific 
 ### iOS App: Browsy
 - **Location**: `ios/Browsy/`
 - **Framework**: SwiftUI
-- **Minimum iOS**: 18.0
+- **Minimum iOS**: 26.0
 - **Dependencies**: BrowsyShared (Swift Package)
 
 ### BrowsyShared (Swift Package)
